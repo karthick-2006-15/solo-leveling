@@ -1,0 +1,149 @@
+﻿@import "tailwindcss";
+
+@theme {
+  --color-system-black: #05070A;
+  --color-system-dark: #0A0F1A;
+  --color-system-darker: #04070D;
+  --color-system-blue: #00E5FF;
+  --color-system-blue-dim: #00A6CC;
+  --color-system-purple: #9D4EDD;
+  --color-system-violet: #7B2CBF;
+  --color-system-gold: #FFB703;
+  --color-system-red: #FF0054;
+  --color-system-green: #00F5D4;
+  --color-system-text: #F8F9FA;
+  --color-system-text-dim: #ADB5BD;
+  --color-system-border: rgba(0, 229, 255, 0.2);
+  --color-system-glow: rgba(0, 229, 255, 0.15);
+
+  --font-display: 'Rajdhani', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --shadow-system: 0 0 20px rgba(0, 229, 255, 0.15);
+  --shadow-system-lg: 0 0 40px rgba(0, 229, 255, 0.25);
+  --shadow-purple: 0 0 20px rgba(157, 78, 221, 0.25);
+  --shadow-gold: 0 0 20px rgba(255, 183, 3, 0.30);
+  --shadow-boss: 0 0 30px rgba(255, 0, 84, 0.30);
+  --shadow-glow-blue: 0 0 12px rgba(0, 229, 255, 0.90);
+  --shadow-glow-gold: 0 0 12px rgba(255, 183, 3, 0.90);
+  --shadow-glow-red: 0 0 12px rgba(255, 0, 84, 0.90);
+  --shadow-inner-glow: inset 0 0 40px rgba(0, 229, 255, 0.05);
+
+  --animate-pulse-slow: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-glow-pulse: glow-pulse 2s ease-in-out infinite;
+  --animate-shimmer: shimmer 1.5s infinite;
+  --animate-scan: scan 4s linear infinite;
+  --animate-scan-vertical: scan-vertical 4s linear infinite;
+}
+
+@layer base {
+  body {
+    background: var(--color-system-black);
+    background-image: 
+      radial-gradient(circle at 15% 50%, rgba(0, 229, 255, 0.06), transparent 25%),
+      radial-gradient(circle at 85% 30%, rgba(157, 78, 221, 0.06), transparent 25%);
+    background-attachment: fixed;
+    color: var(--color-system-text);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    touch-action: pan-x pan-y;
+  }
+
+  ::-webkit-scrollbar { 
+    width: 6px; 
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track { 
+    background: var(--color-system-darker); 
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 229, 255, 0.2);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 229, 255, 0.5);
+  }
+}
+
+@layer utilities {
+  @keyframes shimmer { 
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; } 
+  }
+  
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+    100% { transform: translateY(0px); }
+  }
+
+  @keyframes pulse-slow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.4); }
+  }
+
+  @keyframes scan {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  @keyframes scan-vertical {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+  }
+
+  .bg-shimmer {
+    background: linear-gradient(90deg,
+      rgba(0,229,255,0.02) 0%,
+      rgba(0,229,255,0.08) 50%,
+      rgba(0,229,255,0.02) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  .hud-glass {
+    background: rgba(10, 15, 26, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--color-system-border);
+    box-shadow: var(--shadow-system);
+  }
+
+  .hud-border-glow {
+    position: relative;
+  }
+  
+  .hud-border-glow::before {
+    content: '';
+    position: absolute;
+    top: -1px; left: -1px; right: -1px; bottom: -1px;
+    border: 1px solid var(--color-system-blue);
+    border-radius: inherit;
+    box-shadow: var(--shadow-glow-blue);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .hud-border-glow:hover::before {
+    opacity: 1;
+  }
+
+  .hex-bg {
+    background-color: var(--color-system-dark);
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='69' viewBox='0 0 40 69' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 0L40 11.5v23L20 46 0 34.5v-23L20 0zm0 69L0 57.5v-23L20 23l20 11.5v23L20 69z' fill='rgba(0, 229, 255, 0.03)' fill-rule='evenodd'/%3E%3C/svg%3E");
+  }
+
+  .clip-edges {
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  }
+}

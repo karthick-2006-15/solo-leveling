@@ -1,0 +1,18 @@
+{
+  "watch": ["src"],
+  "ext": "ts,json",
+  "ignore": [
+    "node_modules",
+    "dist",
+    "build",
+    "logs",
+    "coverage",
+    ".git",
+    "client",
+    ".cache",
+    "src/**/*.spec.ts"
+  ],
+  "delay": 1500,
+  "signal": "SIGINT",
+  "exec": "node -r ts-node/register"
+}

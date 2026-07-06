@@ -1,0 +1,56 @@
+import mongoose, { Document, Schema } from 'mongoose';
+
+export interface IUser extends Document {
+  name: string;
+  email: string;
+  passwordHash?: string;
+  googleId?: string;
+  age?: number;
+  gender?: string;
+  height?: number;
+  weight?: number;
+  bodyFatPercent?: number;
+  fitnessGoal?: 'lose_weight' | 'gain_muscle' | 'maintain' | 'general_health';
+  dailyCalorieGoal?: number;
+  dailyProteinGoal?: number;
+  dailyWaterGoalLiters?: number;
+  activityLevel?: 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active';
+  experienceLevel?: 'beginner' | 'intermediate' | 'advanced';
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const UserSchema: Schema = new Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  passwordHash: { type: String },
+  googleId: { type: String },
+  
+  // Profile Stats
+  age: { type: Number },
+  gender: { type: String },
+  height: { type: Number }, // in cm
+  weight: { type: Number }, // in kg
+  bodyFatPercent: { type: Number },
+  
+  // Goals
+  fitnessGoal: { 
+    type: String, 
+    enum: ['lose_weight', 'gain_muscle', 'maintain', 'general_health'] 
+  },
+  dailyCalorieGoal: { type: Number },
+  dailyProteinGoal: { type: Number },
+  dailyWaterGoalLiters: { type: Number },
+  
+  // Levels
+  activityLevel: { 
+    type: String, 
+    enum: ['sedentary', 'light', 'moderate', 'active', 'very_active'] 
+  },
+  experienceLevel: { 
+    type: String, 
+    enum: ['beginner', 'intermediate', 'advanced'] 
+  }
+}, { timestamps: true });
+
+export default mongoose.model<IUser>('User', UserSchema);

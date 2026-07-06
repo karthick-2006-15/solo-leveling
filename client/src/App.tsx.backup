@@ -1,0 +1,178 @@
+import React, { Suspense } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { BottomNav } from './components/layout/BottomNav';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from 'react-hot-toast';
+import { MissionToastManager } from './components/ui/MissionToastManager';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import ParticleField from './components/ui/ParticleField';
+
+const Login = React.lazy(() => import('./pages/Login').then(module => ({ default: module.Login })));
+const Dashboard = React.lazy(() => import('./pages/Dashboard').then(module => ({ default: module.Dashboard })));
+const Profile = React.lazy(() => import('./pages/Profile').then(module => ({ default: module.Profile })));
+const Habits = React.lazy(() => import('./pages/Habits').then(module => ({ default: module.Habits })));
+const Workouts = React.lazy(() => import('./pages/Workouts').then(module => ({ default: module.Workouts })));
+const Nutrition = React.lazy(() => import('./pages/Nutrition').then(module => ({ default: module.Nutrition })));
+const Skills = React.lazy(() => import('./pages/Skills').then(module => ({ default: module.Skills })));
+const DSA = React.lazy(() => import('./pages/DSA').then(module => ({ default: module.DSA })));
+const Achievements = React.lazy(() => import('./pages/Achievements').then(module => ({ default: module.Achievements })));
+const AnalyticsDashboard = React.lazy(() => import('./pages/AnalyticsDashboard').then(module => ({ default: module.AnalyticsDashboard })));
+const Assistant = React.lazy(() => import('./pages/Assistant').then(module => ({ default: module.Assistant })));
+const NotificationsSettings = React.lazy(() => import('./pages/NotificationsSettings').then(module => ({ default: module.NotificationsSettings })));
+const MealPlanner = React.lazy(() => import('./pages/MealPlanner').then(module => ({ default: module.MealPlanner })));
+const WeeklyReview = React.lazy(() => import('./pages/WeeklyReview').then(module => ({ default: module.WeeklyReview })));
+const NotFound = React.lazy(() => import('./pages/NotFound').then(module => ({ default: module.NotFound })));
+import { AIAssistant } from './components/ui/AIAssistant';
+import { useAuthStore } from './store/useAuthStore';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes
+      refetchOnWindowFocus: false,
+      retry: 1,
+      retryDelay: (attempt) => Math.min(attempt * 2000, 10000), // Exponential backoff
+    },
+  },
+});
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <div className="min-h-screen flex flex-col relative overflow-hidden bg-[var(--color-system-black)] pb-16 md:pb-0 md:pt-16">
+          <ParticleField />
+          <Toaster position="bottom-right" />
+          <MissionToastManager />
+          <BottomNav />
+          <main className="flex-grow p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full relative z-10">
+            <ErrorBoundary>
+              <Suspense fallback={<div className="flex items-center justify-center h-full text-neonBlue">Loading module...</div>}>
+                <Routes>
+                  <Route path="/login" element={<Login />} />
+                <Route 
+                  path="/" 
+                  element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/profile" 
+                  element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/habits" 
+                  element={
+                    <ProtectedRoute>
+                      <Habits />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/workouts" 
+                  element={
+                    <ProtectedRoute>
+                      <Workouts />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/nutrition" 
+                  element={
+                    <ProtectedRoute>
+                      <Nutrition />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/skills" 
+                  element={
+                    <ProtectedRoute>
+                      <Skills />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/dsa" 
+                  element={
+                    <ProtectedRoute>
+                      <DSA />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/achievements" 
+                  element={
+                    <ProtectedRoute>
+                      <Achievements />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/analytics" 
+                  element={
+                    <ProtectedRoute>
+                      <AnalyticsDashboard />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/assistant" 
+                  element={
+                    <ProtectedRoute>
+                      <Assistant />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/ai/meal-plan" 
+                  element={
+                    <ProtectedRoute>
+                      <MealPlanner />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/ai/weekly-review" 
+                  element={
+                    <ProtectedRoute>
+                      <WeeklyReview />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/settings/notifications" 
+                  element={
+                    <ProtectedRoute>
+                      <NotificationsSettings />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+            </ErrorBoundary>
+          </main>
+          <AIAssistantWrapper />
+        </div>
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+}
+
+// Wrapper to only show AI Assistant when authenticated
+function AIAssistantWrapper() {
+  const { isAuthenticated } = useAuthStore();
+  if (!isAuthenticated) return null;
+  return <AIAssistant />;
+}
+
+export default App;
