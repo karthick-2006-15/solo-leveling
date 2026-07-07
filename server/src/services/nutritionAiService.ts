@@ -74,85 +74,219 @@ Provide highly accurate, realistic macros. For instance, 1 average Vegetable Sam
 
 const SIMPLE_FOOD_REGEX = /^(\d+(?:\.\d+)?)\s*([a-zA-Z]+)?\s+(.+)$/i;
 
+interface LocalFoodDefinition {
+  isHardcoded: boolean;
+  search: string;
+  expectedCalsPer100g?: number;
+  macrosPer100g?: { cals: number, prot: number, fat: number, carb: number, fiber: number };
+  macrosPerPiece?: { cals: number, prot: number, fat: number, carb: number, fiber: number };
+  defaultWeightGramsPerPiece?: number;
+}
+
+const LOCAL_FOOD_DICT: Record<string, LocalFoodDefinition> = {
+  "rice": { isHardcoded: false, search: "cooked white rice", expectedCalsPer100g: 130 },
+  "boiled rice": { isHardcoded: false, search: "cooked white rice", expectedCalsPer100g: 130 },
+  "banana": { isHardcoded: false, search: "banana, raw", expectedCalsPer100g: 89, defaultWeightGramsPerPiece: 118 },
+  "egg": { isHardcoded: false, search: "whole egg, raw", expectedCalsPer100g: 143, defaultWeightGramsPerPiece: 50 },
+  "milk": { isHardcoded: false, search: "milk, whole, 3.25%", expectedCalsPer100g: 61, defaultWeightGramsPerPiece: 240 },
+  "apple": { isHardcoded: false, search: "apple, raw", expectedCalsPer100g: 52, defaultWeightGramsPerPiece: 182 },
+  "curd": { isHardcoded: false, search: "yogurt, plain, whole milk", expectedCalsPer100g: 61 },
+  "paneer": { isHardcoded: false, search: "cheese, paneer", expectedCalsPer100g: 265 },
+  "dosa": { isHardcoded: true, search: "Dosa (Plain)", macrosPerPiece: { cals: 133, prot: 3, fat: 3, carb: 23, fiber: 1 }, defaultWeightGramsPerPiece: 80 },
+  "idli": { isHardcoded: true, search: "Idli", macrosPerPiece: { cals: 58, prot: 2, fat: 0.2, carb: 12, fiber: 1.5 }, defaultWeightGramsPerPiece: 40 },
+  "chapati": { isHardcoded: true, search: "Chapati", macrosPerPiece: { cals: 104, prot: 3, fat: 1.5, carb: 20, fiber: 3 }, defaultWeightGramsPerPiece: 40 },
+  "roti": { isHardcoded: true, search: "Roti", macrosPerPiece: { cals: 104, prot: 3, fat: 1.5, carb: 20, fiber: 3 }, defaultWeightGramsPerPiece: 40 },
+  "sambar": { isHardcoded: true, search: "Sambar", macrosPer100g: { cals: 75, prot: 3, fat: 2, carb: 11, fiber: 2 }, defaultWeightGramsPerPiece: 150 },
+  "rasam": { isHardcoded: true, search: "Rasam", macrosPer100g: { cals: 45, prot: 1, fat: 1.5, carb: 7, fiber: 1 }, defaultWeightGramsPerPiece: 150 },
+  "medu vada": { isHardcoded: true, search: "Medu Vada", macrosPerPiece: { cals: 97, prot: 3, fat: 5, carb: 10, fiber: 1 }, defaultWeightGramsPerPiece: 35 },
+  "vada": { isHardcoded: true, search: "Medu Vada", macrosPerPiece: { cals: 97, prot: 3, fat: 5, carb: 10, fiber: 1 }, defaultWeightGramsPerPiece: 35 },
+  "poha": { isHardcoded: true, search: "Poha", macrosPer100g: { cals: 180, prot: 4, fat: 5, carb: 30, fiber: 2 }, defaultWeightGramsPerPiece: 150 },
+  "upma": { isHardcoded: true, search: "Upma", macrosPer100g: { cals: 130, prot: 4, fat: 4, carb: 18, fiber: 2 }, defaultWeightGramsPerPiece: 150 },
+  "biryani": { isHardcoded: true, search: "Chicken Biryani", macrosPer100g: { cals: 160, prot: 8, fat: 6, carb: 18, fiber: 1 }, defaultWeightGramsPerPiece: 350 },
+  "chicken curry": { isHardcoded: true, search: "Chicken Curry", macrosPer100g: { cals: 130, prot: 12, fat: 8, carb: 4, fiber: 1 }, defaultWeightGramsPerPiece: 200 },
+  "fish curry": { isHardcoded: true, search: "Fish Curry", macrosPer100g: { cals: 110, prot: 10, fat: 6, carb: 4, fiber: 0.5 }, defaultWeightGramsPerPiece: 200 }
+};
+
+const COMMON_UNITS = ['g', 'ml', 'cup', 'cups', 'piece', 'pieces', 'slice', 'slices', 'bowl', 'plate', 'kg', 'tbsp', 'tsp'];
+
 async function parseSimpleFood(text: string): Promise<NutritionAnalysisResult | null> {
-  const match = text.trim().match(SIMPLE_FOOD_REGEX);
-  if (!match) return null;
+  if (text.length > 100) return null; // Too complex for simple parsing
 
-  if (text.length > 50) return null; // Avoid confusing natural language with simple inputs
+  const chunks = text.split(/\b(?:and|with|&|,)\b/i).map(c => c.trim()).filter(Boolean);
+  const detectedFoods: AnalyzedFood[] = [];
+  
+  for (const chunk of chunks) {
+    let quantity = 1;
+    let unit = 'Pieces';
+    let foodName = chunk;
 
-  const quantityStr = match[1];
-  let unit = match[2] || 'Pieces';
-  let foodName = match[3];
-
-  const commonUnits = ['g', 'ml', 'cup', 'cups', 'piece', 'pieces', 'slice', 'slices', 'bowl', 'plate', 'kg', 'tbsp', 'tsp'];
-  if (unit && !commonUnits.includes(unit.toLowerCase())) {
-    foodName = `${unit} ${foodName}`;
-    unit = 'Pieces';
-  }
-
-  const quantity = parseFloat(quantityStr);
-
-  try {
-    const apiKey = process.env.USDA_API_KEY || 'DEMO_KEY';
-    const url = `https://api.nal.usda.gov/fdc/v1/foods/search?query=${encodeURIComponent(foodName)}&api_key=${apiKey}&pageSize=1`;
-    const response = await axios.get(url);
-
-    if (response.data && response.data.foods && response.data.foods.length > 0) {
-      const food = response.data.foods[0];
+    const match = chunk.match(SIMPLE_FOOD_REGEX);
+    if (match) {
+      quantity = parseFloat(match[1]);
+      const potentialUnit = match[2];
+      const rest = match[3];
       
-      let multiplier = quantity;
-      let estimatedWeightGrams = quantity * 100;
-
-      if (unit.toLowerCase() === 'g' || unit.toLowerCase() === 'ml') {
-         multiplier = quantity / 100;
-         estimatedWeightGrams = quantity;
+      if (potentialUnit && COMMON_UNITS.includes(potentialUnit.toLowerCase())) {
+        unit = potentialUnit;
+        foodName = rest;
       } else {
-        const portion = food.foodPortions?.find((p: any) => p.gramWeight);
-        if (portion && portion.gramWeight) {
-          estimatedWeightGrams = quantity * portion.gramWeight;
-          multiplier = estimatedWeightGrams / 100;
-        }
+        foodName = potentialUnit ? `${potentialUnit} ${rest}` : rest;
       }
+    }
 
-      const getNutrient = (id: number) => {
-        const nut = food.foodNutrients.find((n: any) => n.nutrientId === id);
-        return nut ? nut.value * multiplier : 0;
-      };
-
-      const calories = getNutrient(1008); 
-      const protein = getNutrient(1003); 
-      const fat = getNutrient(1004); 
-      const carbs = getNutrient(1005); 
-      const fiber = getNutrient(1079); 
-
-      const analyzedFood: AnalyzedFood = {
-        foodName: food.description,
+    foodName = foodName.trim().toLowerCase();
+    
+    // Remove pluralization for better matching (e.g. bananas -> banana)
+    const singularName = foodName.endsWith('s') && !foodName.endsWith('ss') ? foodName.slice(0, -1) : foodName;
+    
+    const dictEntry = LOCAL_FOOD_DICT[foodName] || LOCAL_FOOD_DICT[singularName];
+    
+    if (dictEntry && dictEntry.isHardcoded) {
+      let multiplier = quantity;
+      let estWeight = quantity * (dictEntry.defaultWeightGramsPerPiece || 100);
+      
+      if (unit.toLowerCase() === 'g' || unit.toLowerCase() === 'ml') {
+        estWeight = quantity;
+        multiplier = dictEntry.macrosPer100g ? (quantity / 100) : (quantity / (dictEntry.defaultWeightGramsPerPiece || 100));
+      } else {
+        multiplier = dictEntry.macrosPerPiece ? quantity : (estWeight / 100);
+      }
+      
+      const macros = dictEntry.macrosPerPiece || dictEntry.macrosPer100g || { cals: 0, prot: 0, fat: 0, carb: 0, fiber: 0 };
+      
+      detectedFoods.push({
+        foodName: dictEntry.search,
         quantity,
         unit,
-        estimatedWeightGrams: Math.round(estimatedWeightGrams),
-        calories: Math.round(calories),
-        protein: Math.round(protein),
-        carbs: Math.round(carbs),
-        fat: Math.round(fat),
-        fiber: Math.round(fiber),
-        confidence: 95,
-        source: 'USDA Database (Local Parse)'
-      };
-
-      console.log('[Parser] Success');
-
-      return {
-        detectedFoods: [analyzedFood],
-        systemAnalysis: "SYSTEM ANALYSIS: Target acquired and mapped perfectly. No additional processing required.",
-        waterRecommendationMl: 0,
-        totalCalories: analyzedFood.calories,
-        totalProtein: analyzedFood.protein,
-        totalCarbs: analyzedFood.carbs,
-        totalFat: analyzedFood.fat
-      };
+        estimatedWeightGrams: Math.round(estWeight),
+        calories: Math.round(macros.cals * multiplier),
+        protein: Math.round(macros.prot * multiplier),
+        carbs: Math.round(macros.carb * multiplier),
+        fat: Math.round(macros.fat * multiplier),
+        fiber: Math.round(macros.fiber * multiplier),
+        confidence: 100,
+        source: 'Hunter Database (Verified)'
+      });
+      continue;
     }
-  } catch (err) {
-    // Silently fail local parse and fall back to AI
+
+    const searchQuery = dictEntry ? dictEntry.search : foodName;
+    const expectedCalsPer100g = dictEntry ? dictEntry.expectedCalsPer100g : null;
+
+    try {
+      const apiKey = process.env.USDA_API_KEY || 'DEMO_KEY';
+      const url = `https://api.nal.usda.gov/fdc/v1/foods/search?query=${encodeURIComponent(searchQuery)}&api_key=${apiKey}&pageSize=20`;
+      const response = await axios.get(url);
+
+      if (response.data && response.data.foods && response.data.foods.length > 0) {
+        let bestFood = null;
+        let bestScore = -9999;
+
+        for (const food of response.data.foods) {
+          let score = 0;
+          const descLower = food.description.toLowerCase();
+          
+          // Core Entity Enforcement
+          const coreEntity = foodName.replace(/boiled|cooked|raw|fresh|fried|steamed|grilled|roasted/gi, '').trim().toLowerCase();
+          if (coreEntity) {
+            // Check if any word in the core entity exists in the description
+            const coreWords = coreEntity.split(/\s+/);
+            const hasCoreMatch = coreWords.some(word => descLower.includes(word));
+            if (hasCoreMatch) {
+              score += 500;
+            } else {
+              score -= 500; // Penalize if it doesn't even contain the main ingredient word
+            }
+          }
+
+          if (descLower === searchQuery.toLowerCase() || descLower === foodName) score += 50;
+          else if (descLower.includes(searchQuery.toLowerCase())) score += 20;
+
+          const positiveMods = ['raw', 'fresh', 'cooked', 'boiled', 'steamed', 'grilled', 'roasted', 'fried', 'curry'];
+          for (const mod of positiveMods) {
+            if (foodName.includes(mod) && descLower.includes(mod)) score += 20;
+          }
+
+          if (foodName.includes('boiled') && (descLower.includes('raw') || descLower.includes('fried'))) score -= 50;
+          if (foodName.includes('raw') && (descLower.includes('cooked') || descLower.includes('boiled'))) score -= 50;
+          if (foodName.includes('fried') && (descLower.includes('raw') || descLower.includes('boiled'))) score -= 50;
+
+          const negativeMods = ['powder', 'dehydrated', 'freeze dried', 'chips', 'snack', 'mix', 'supplement', 'protein', 'formula', 'extract', 'flour', 'beverage', 'drink'];
+          for (const mod of negativeMods) {
+            if (!foodName.includes(mod) && descLower.includes(mod)) {
+              score -= 100;
+            }
+          }
+
+          if (expectedCalsPer100g) {
+            const calNut = food.foodNutrients.find((n: any) => n.nutrientId === 1008);
+            if (calNut) {
+              const diff = Math.abs(calNut.value - expectedCalsPer100g);
+              if (diff > expectedCalsPer100g * 0.35) {
+                score -= 200; // Heavily penalize impossible matches
+              }
+            }
+          }
+
+          if (score > bestScore) {
+            bestScore = score;
+            bestFood = food;
+          }
+        }
+
+        if (bestFood && bestScore > -100) {
+          let multiplier = quantity;
+          let estimatedWeightGrams = quantity * (dictEntry?.defaultWeightGramsPerPiece || 100);
+
+          if (unit.toLowerCase() === 'g' || unit.toLowerCase() === 'ml') {
+             multiplier = quantity / 100;
+             estimatedWeightGrams = quantity;
+          } else {
+            const portion = bestFood.foodPortions?.find((p: any) => p.gramWeight);
+            if (portion && portion.gramWeight) {
+              estimatedWeightGrams = quantity * portion.gramWeight;
+              multiplier = estimatedWeightGrams / 100;
+            } else {
+              multiplier = estimatedWeightGrams / 100;
+            }
+          }
+
+          const getNutrient = (id: number) => {
+            const nut = bestFood.foodNutrients.find((n: any) => n.nutrientId === id);
+            return nut ? nut.value * multiplier : 0;
+          };
+
+          detectedFoods.push({
+            foodName: bestFood.description,
+            quantity,
+            unit,
+            estimatedWeightGrams: Math.round(estimatedWeightGrams),
+            calories: Math.round(getNutrient(1008)),
+            protein: Math.round(getNutrient(1003)),
+            carbs: Math.round(getNutrient(1005)),
+            fat: Math.round(getNutrient(1004)),
+            fiber: Math.round(getNutrient(1079)),
+            confidence: 90,
+            source: 'USDA Database (Smart Rank)'
+          });
+        }
+      }
+    } catch (err) {
+      console.error('USDA search failed:', err);
+    }
+  }
+
+  if (detectedFoods.length > 0) {
+    console.log('[Parser] Success');
+    return {
+      detectedFoods,
+      systemAnalysis: "SYSTEM ANALYSIS: Target acquired and mapped perfectly via internal parser. No AI processing required.",
+      waterRecommendationMl: 0,
+      totalCalories: detectedFoods.reduce((acc, f) => acc + f.calories, 0),
+      totalProtein: detectedFoods.reduce((acc, f) => acc + f.protein, 0),
+      totalCarbs: detectedFoods.reduce((acc, f) => acc + f.carbs, 0),
+      totalFat: detectedFoods.reduce((acc, f) => acc + f.fat, 0)
+    };
   }
 
   return null;
