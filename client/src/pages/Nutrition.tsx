@@ -12,7 +12,7 @@ import { formatSafeDate } from '../utils/dateUtils';
 import { NutritionScannerHUD } from '../components/nutrition/NutritionScannerHUD';
 import { FoodHunterCard } from '../components/nutrition/FoodHunterCard';
 import { HunterBackground } from '../components/nutrition/HunterBackground';
-import { HunterMissionBar } from '../components/nutrition/HunterMissionBars';
+import { HunterMissionRing } from '../components/nutrition/HunterMissionBars';
 import type { NutritionAnalysisResult } from '../types/nutrition';
 
 type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
@@ -232,20 +232,11 @@ export const Nutrition: React.FC = () => {
         {/* Left Col: Macros & Water */}
         <div className="space-y-6">
           <SystemWindow title="Metabolic Intake" className="h-auto">
-            <div className="space-y-6 pt-2">
-              <HunterMissionBar label="Energy" current={todayCalories} max={calorieTarget} unit="KCAL" colorHex="#00d4ff" />
-              <HunterMissionBar label="Protein" current={todayProtein} max={proteinTarget} unit="G" colorHex="#00d4ff" />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 text-center mt-8">
-              <div className="bg-[rgba(255,255,255,0.02)] rounded-[2px] p-4 border border-[rgba(255,255,255,0.05)]">
-                <div className="text-[20px] font-mono font-bold text-white mb-1">{todayCarbs.toFixed(0)}g</div>
-                <div className="text-[10px] text-[var(--color-system-text-dim)] font-mono uppercase tracking-widest">Carbs</div>
-              </div>
-              <div className="bg-[rgba(255,255,255,0.02)] rounded-[2px] p-4 border border-[rgba(255,255,255,0.05)]">
-                <div className="text-[20px] font-mono font-bold text-white mb-1">{todayFat.toFixed(0)}g</div>
-                <div className="text-[10px] text-[var(--color-system-text-dim)] font-mono uppercase tracking-widest">Fat</div>
-              </div>
+            <div className="grid grid-cols-2 gap-4 pt-4 pb-2">
+              <HunterMissionRing label="Energy" current={todayCalories} max={calorieTarget} unit="KCAL" colorHex="#22d3ee" size={100} strokeWidth={6} />
+              <HunterMissionRing label="Protein" current={todayProtein} max={proteinTarget} unit="G" colorHex="#818cf8" size={100} strokeWidth={6} />
+              <HunterMissionRing label="Carbs" current={todayCarbs} max={250} unit="G" colorHex="#38bdf8" size={100} strokeWidth={6} />
+              <HunterMissionRing label="Fat" current={todayFat} max={70} unit="G" colorHex="#60a5fa" size={100} strokeWidth={6} />
             </div>
           </SystemWindow>
 
@@ -397,23 +388,42 @@ export const Nutrition: React.FC = () => {
             </div>
           </SystemWindow>
 
-          <SystemWindow title="Energy Trend" className="h-[300px]" innerClassName="p-4 pt-6 h-full flex flex-col">
-            <div className="flex-1 min-h-0 w-full">
+          <SystemWindow title="Energy Trend" className="h-[300px]" innerClassName="p-4 pt-6 h-full flex flex-col bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyOCIgaGVpZ2h0PSI0OSIgdmlld0JveD0iMCAwIDI4IDQ5Ij48cGF0aCBmaWxsPSIjMDBkNGZmIiBkPSJNMTMuOTkgMTEuMjVMNSAyNi43OXYtMTUuNTRMMTMuOTkgNC4ydjcuMDV6TTI4IDI2Ljc5TTEzLjk5IDM3Ljc1TDIzIDEyLjJWMjcuNzRsLTkuMDEgMTB6Ii8+PC9zdmc+')] bg-[length:30px_30px] shadow-[inset_0_0_50px_rgba(0,0,0,0.9)] relative overflow-hidden">
+            <div className="absolute inset-0 bg-black/60 pointer-events-none" />
+            <div className="flex-1 min-h-0 w-full relative z-10">
               {graphData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={graphData}>
+                  <AreaChart data={graphData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorCal" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="var(--color-system-blue)" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="var(--color-system-blue)" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="#22d3ee" stopOpacity={0.5}/>
+                        <stop offset="95%" stopColor="#22d3ee" stopOpacity={0}/>
                       </linearGradient>
+                      <filter id="glow">
+                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                        <feMerge>
+                          <feMergeNode in="coloredBlur"/>
+                          <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                      </filter>
                     </defs>
-                    <XAxis dataKey="date" stroke="rgba(255,255,255,0.2)" fontSize={10} tickLine={false} axisLine={false} fontFamily="JetBrains Mono" />
-                    <YAxis stroke="rgba(255,255,255,0.2)" fontSize={10} tickLine={false} axisLine={false} fontFamily="JetBrains Mono" width={40} />
+                    <XAxis dataKey="date" stroke="rgba(34,211,238,0.3)" fontSize={10} tickLine={false} axisLine={false} fontFamily="JetBrains Mono" />
+                    <YAxis stroke="rgba(34,211,238,0.3)" fontSize={10} tickLine={false} axisLine={false} fontFamily="JetBrains Mono" width={40} />
                     <Tooltip 
-                      contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid rgba(0,212,255,0.3)', borderRadius: '4px', fontFamily: 'JetBrains Mono', fontSize: '12px' }} 
+                      contentStyle={{ backgroundColor: 'rgba(8,51,68,0.9)', border: '1px solid rgba(34,211,238,0.4)', borderRadius: '8px', fontFamily: 'JetBrains Mono', fontSize: '12px', boxShadow: '0 0 15px rgba(34,211,238,0.2)', backdropFilter: 'blur(10px)' }} 
+                      itemStyle={{ color: '#22d3ee' }}
+                      cursor={{ stroke: 'rgba(34,211,238,0.2)', strokeWidth: 1, strokeDasharray: '4 4' }}
                     />
-                    <Area type="monotone" dataKey="calories" stroke="var(--color-system-blue)" strokeWidth={2} fillOpacity={1} fill="url(#colorCal)" />
+                    <Area 
+                      type="monotone" 
+                      dataKey="calories" 
+                      stroke="#22d3ee" 
+                      strokeWidth={3} 
+                      fillOpacity={1} 
+                      fill="url(#colorCal)"
+                      activeDot={{ r: 6, fill: '#22d3ee', stroke: '#000', strokeWidth: 2, style: { filter: 'url(#glow)' } }}
+                      style={{ filter: 'url(#glow)' }}
+                    />
                   </AreaChart>
                 </ResponsiveContainer>
               ) : (

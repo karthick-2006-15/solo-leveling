@@ -4,9 +4,7 @@ import axios from 'axios';
 let aiClient: GoogleGenAI;
 const getAi = () => {
   if (!aiClient) {
-    aiClient = new GoogleGenAI({
-      apiKey: process.env.GEMINI_API_KEY || 'dummy_key'
-    });
+    aiClient = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || 'dummy_key' });
   }
   return aiClient;
 };
@@ -36,40 +34,24 @@ export interface NutritionAnalysisResult {
   totalFat: number;
 }
 
+// AI is now strictly an Entity Extractor, NEVER a macro calculator
 const SYSTEM_PROMPT = `
-You are the "System" - an advanced, omniscient AI Hunter System from Solo Leveling.
-Your objective is to analyze the user's food input, recognize exactly what they ate (especially Indian foods like Samosa, Dosa, Idli, Biryani, as well as general foods), and calculate precise macronutrients.
+You are the "System" - an advanced AI Hunter System.
+The user will input what they ate (e.g., "I had 2 idlis and a packet of lays").
+Your ONLY job is to identify the individual food items, normalize their names, and extract quantities.
+DO NOT calculate calories or macros. You are strictly a parsing engine.
 
-The user will provide a natural language input (e.g. "Lunch 2 samosa 1 tea 1 banana", "500g rice").
-
-Your response MUST be a STRICT JSON object with the following schema:
+Your response MUST be a STRICT JSON object:
 {
   "detectedFoods": [
     {
-      "foodName": "String (Normalized name, e.g., 'Vegetable Samosa')",
-      "quantity": "Number",
-      "unit": "String (e.g., 'Pieces', 'Grams', 'Cups')",
-      "estimatedWeightGrams": "Number (Total weight in grams for this specific quantity)",
-      "calories": "Number",
-      "protein": "Number",
-      "carbs": "Number",
-      "fat": "Number",
-      "fiber": "Number",
-      "confidence": "Number (0 to 100). If you are unsure, rate below 70.",
-      "source": "String (e.g., 'Indian Food Database', 'Global AI Estimation')",
-      "alternatives": ["String"] // Only populate if confidence is < 70, e.g. ["Chicken Samosa", "Frozen Samosa"]
+      "foodName": "String (Normalized clean search query, e.g., 'Idli', 'Lays Magic Masala Chips', 'Cooked White Rice', 'Fresh Mango')",
+      "quantity": 1,
+      "unit": "String (e.g., 'piece', 'g', 'ml', 'cup', 'packet')"
     }
-  ],
-  "systemAnalysis": "String. A cool, AI-like analysis of the meal (e.g., 'SYSTEM ANALYSIS: Fat intake is high. Recommend grilled chicken for dinner.')",
-  "waterRecommendationMl": "Number. E.g., 500",
-  "totalCalories": "Number",
-  "totalProtein": "Number",
-  "totalCarbs": "Number",
-  "totalFat": "Number"
+  ]
 }
-
-Do NOT wrap the response in markdown blocks. Output raw JSON only.
-Provide highly accurate, realistic macros. For instance, 1 average Vegetable Samosa is ~260 kcal, 2 Pieces = 520 kcal.
+Do NOT output markdown blocks.
 `;
 
 const SIMPLE_FOOD_REGEX = /^(\d+(?:\.\d+)?)\s*([a-zA-Z]+)?\s+(.+)$/i;
@@ -92,6 +74,9 @@ const LOCAL_FOOD_DICT: Record<string, LocalFoodDefinition> = {
   "apple": { isHardcoded: false, search: "apple, raw", expectedCalsPer100g: 52, defaultWeightGramsPerPiece: 182 },
   "curd": { isHardcoded: false, search: "yogurt, plain, whole milk", expectedCalsPer100g: 61 },
   "paneer": { isHardcoded: false, search: "cheese, paneer", expectedCalsPer100g: 265 },
+  "paneer butter masala": { isHardcoded: true, search: "Paneer Butter Masala", macrosPer100g: { cals: 250, prot: 8, fat: 20, carb: 10, fiber: 2 }, defaultWeightGramsPerPiece: 200 },
+  
+  // IFCT / NIN Additions
   "dosa": { isHardcoded: true, search: "Dosa (Plain)", macrosPerPiece: { cals: 133, prot: 3, fat: 3, carb: 23, fiber: 1 }, defaultWeightGramsPerPiece: 80 },
   "idli": { isHardcoded: true, search: "Idli", macrosPerPiece: { cals: 58, prot: 2, fat: 0.2, carb: 12, fiber: 1.5 }, defaultWeightGramsPerPiece: 40 },
   "chapati": { isHardcoded: true, search: "Chapati", macrosPerPiece: { cals: 104, prot: 3, fat: 1.5, carb: 20, fiber: 3 }, defaultWeightGramsPerPiece: 40 },
@@ -104,316 +89,348 @@ const LOCAL_FOOD_DICT: Record<string, LocalFoodDefinition> = {
   "upma": { isHardcoded: true, search: "Upma", macrosPer100g: { cals: 130, prot: 4, fat: 4, carb: 18, fiber: 2 }, defaultWeightGramsPerPiece: 150 },
   "biryani": { isHardcoded: true, search: "Chicken Biryani", macrosPer100g: { cals: 160, prot: 8, fat: 6, carb: 18, fiber: 1 }, defaultWeightGramsPerPiece: 350 },
   "chicken curry": { isHardcoded: true, search: "Chicken Curry", macrosPer100g: { cals: 130, prot: 12, fat: 8, carb: 4, fiber: 1 }, defaultWeightGramsPerPiece: 200 },
-  "fish curry": { isHardcoded: true, search: "Fish Curry", macrosPer100g: { cals: 110, prot: 10, fat: 6, carb: 4, fiber: 0.5 }, defaultWeightGramsPerPiece: 200 }
+  "fish curry": { isHardcoded: true, search: "Fish Curry", macrosPer100g: { cals: 110, prot: 10, fat: 6, carb: 4, fiber: 0.5 }, defaultWeightGramsPerPiece: 200 },
+  "egg curry": { isHardcoded: true, search: "Egg Curry", macrosPer100g: { cals: 120, prot: 8, fat: 9, carb: 4, fiber: 1 }, defaultWeightGramsPerPiece: 200 },
+  "pongal": { isHardcoded: true, search: "Pongal", macrosPer100g: { cals: 150, prot: 4, fat: 6, carb: 20, fiber: 1.5 }, defaultWeightGramsPerPiece: 200 },
+  "lemon rice": { isHardcoded: true, search: "Lemon Rice", macrosPer100g: { cals: 160, prot: 3, fat: 6, carb: 24, fiber: 1 }, defaultWeightGramsPerPiece: 200 },
+  "curd rice": { isHardcoded: true, search: "Curd Rice", macrosPer100g: { cals: 110, prot: 3, fat: 4, carb: 15, fiber: 1 }, defaultWeightGramsPerPiece: 200 },
+  "tamarind rice": { isHardcoded: true, search: "Tamarind Rice", macrosPer100g: { cals: 170, prot: 3, fat: 7, carb: 25, fiber: 1 }, defaultWeightGramsPerPiece: 200 },
+  "parotta": { isHardcoded: true, search: "Parotta", macrosPerPiece: { cals: 260, prot: 5, fat: 10, carb: 35, fiber: 1 }, defaultWeightGramsPerPiece: 80 },
+  "poori": { isHardcoded: true, search: "Poori", macrosPerPiece: { cals: 140, prot: 2, fat: 8, carb: 15, fiber: 1 }, defaultWeightGramsPerPiece: 40 },
+  "appam": { isHardcoded: true, search: "Appam", macrosPerPiece: { cals: 120, prot: 2, fat: 3, carb: 22, fiber: 1 }, defaultWeightGramsPerPiece: 60 },
+  "puttu": { isHardcoded: true, search: "Puttu", macrosPer100g: { cals: 170, prot: 3, fat: 2, carb: 35, fiber: 2 }, defaultWeightGramsPerPiece: 150 },
+  "idiyappam": { isHardcoded: true, search: "Idiyappam", macrosPerPiece: { cals: 60, prot: 1, fat: 0.5, carb: 13, fiber: 1 }, defaultWeightGramsPerPiece: 40 }
 };
 
-const COMMON_UNITS = ['g', 'ml', 'cup', 'cups', 'piece', 'pieces', 'slice', 'slices', 'bowl', 'plate', 'kg', 'tbsp', 'tsp'];
+const COMMON_UNITS = ['g', 'ml', 'cup', 'cups', 'piece', 'pieces', 'slice', 'slices', 'bowl', 'plate', 'kg', 'tbsp', 'tsp', 'packet'];
 
-async function parseSimpleFood(text: string): Promise<NutritionAnalysisResult | null> {
-  if (text.length > 100) return null; // Too complex for simple parsing
+function getMultiplier(quantity: number, unit: string, defaultWeightGrams: number): { estWeight: number, multiplier100g: number, multiplierPiece: number } {
+  let estWeight = quantity * defaultWeightGrams;
+  let m100 = estWeight / 100;
+  let mPiece = quantity;
 
-  const chunks = text.split(/\b(?:and|with|&|,)\b/i).map(c => c.trim()).filter(Boolean);
-  const detectedFoods: AnalyzedFood[] = [];
-  
-  for (const chunk of chunks) {
-    let quantity = 1;
-    let unit = 'Pieces';
-    let foodName = chunk;
-
-    const match = chunk.match(SIMPLE_FOOD_REGEX);
-    if (match) {
-      quantity = parseFloat(match[1]);
-      const potentialUnit = match[2];
-      const rest = match[3];
-      
-      if (potentialUnit && COMMON_UNITS.includes(potentialUnit.toLowerCase())) {
-        unit = potentialUnit;
-        foodName = rest;
-      } else {
-        foodName = potentialUnit ? `${potentialUnit} ${rest}` : rest;
-      }
-    }
-
-    foodName = foodName.trim().toLowerCase();
-    
-    // Remove pluralization for better matching (e.g. bananas -> banana)
-    const singularName = foodName.endsWith('s') && !foodName.endsWith('ss') ? foodName.slice(0, -1) : foodName;
-    
-    const dictEntry = LOCAL_FOOD_DICT[foodName] || LOCAL_FOOD_DICT[singularName];
-    
-    if (dictEntry && dictEntry.isHardcoded) {
-      let multiplier = quantity;
-      let estWeight = quantity * (dictEntry.defaultWeightGramsPerPiece || 100);
-      
-      if (unit.toLowerCase() === 'g' || unit.toLowerCase() === 'ml') {
-        estWeight = quantity;
-        multiplier = dictEntry.macrosPer100g ? (quantity / 100) : (quantity / (dictEntry.defaultWeightGramsPerPiece || 100));
-      } else {
-        multiplier = dictEntry.macrosPerPiece ? quantity : (estWeight / 100);
-      }
-      
-      const macros = dictEntry.macrosPerPiece || dictEntry.macrosPer100g || { cals: 0, prot: 0, fat: 0, carb: 0, fiber: 0 };
-      
-      detectedFoods.push({
-        foodName: dictEntry.search,
-        quantity,
-        unit,
-        estimatedWeightGrams: Math.round(estWeight),
-        calories: Math.round(macros.cals * multiplier),
-        protein: Math.round(macros.prot * multiplier),
-        carbs: Math.round(macros.carb * multiplier),
-        fat: Math.round(macros.fat * multiplier),
-        fiber: Math.round(macros.fiber * multiplier),
-        confidence: 100,
-        source: 'Hunter Database (Verified)'
-      });
-      continue;
-    }
-
-    const searchQuery = dictEntry ? dictEntry.search : foodName;
-    const expectedCalsPer100g = dictEntry ? dictEntry.expectedCalsPer100g : null;
-
-    try {
-      const apiKey = process.env.USDA_API_KEY || 'DEMO_KEY';
-      const url = `https://api.nal.usda.gov/fdc/v1/foods/search?query=${encodeURIComponent(searchQuery)}&api_key=${apiKey}&pageSize=20`;
-      const response = await axios.get(url);
-
-      if (response.data && response.data.foods && response.data.foods.length > 0) {
-        let bestFood = null;
-        let bestScore = -9999;
-
-        for (const food of response.data.foods) {
-          let score = 0;
-          const descLower = food.description.toLowerCase();
-          
-          // Core Entity Enforcement
-          const coreEntity = foodName.replace(/boiled|cooked|raw|fresh|fried|steamed|grilled|roasted/gi, '').trim().toLowerCase();
-          if (coreEntity) {
-            // Check if any word in the core entity exists in the description
-            const coreWords = coreEntity.split(/\s+/);
-            const hasCoreMatch = coreWords.some(word => descLower.includes(word));
-            if (hasCoreMatch) {
-              score += 500;
-            } else {
-              score -= 500; // Penalize if it doesn't even contain the main ingredient word
-            }
-          }
-
-          if (descLower === searchQuery.toLowerCase() || descLower === foodName) score += 50;
-          else if (descLower.includes(searchQuery.toLowerCase())) score += 20;
-
-          const positiveMods = ['raw', 'fresh', 'cooked', 'boiled', 'steamed', 'grilled', 'roasted', 'fried', 'curry'];
-          for (const mod of positiveMods) {
-            if (foodName.includes(mod) && descLower.includes(mod)) score += 20;
-          }
-
-          if (foodName.includes('boiled') && (descLower.includes('raw') || descLower.includes('fried'))) score -= 50;
-          if (foodName.includes('raw') && (descLower.includes('cooked') || descLower.includes('boiled'))) score -= 50;
-          if (foodName.includes('fried') && (descLower.includes('raw') || descLower.includes('boiled'))) score -= 50;
-
-          const negativeMods = ['powder', 'dehydrated', 'freeze dried', 'chips', 'snack', 'mix', 'supplement', 'protein', 'formula', 'extract', 'flour', 'beverage', 'drink'];
-          for (const mod of negativeMods) {
-            if (!foodName.includes(mod) && descLower.includes(mod)) {
-              score -= 100;
-            }
-          }
-
-          if (expectedCalsPer100g) {
-            const calNut = food.foodNutrients.find((n: any) => n.nutrientId === 1008);
-            if (calNut) {
-              const diff = Math.abs(calNut.value - expectedCalsPer100g);
-              if (diff > expectedCalsPer100g * 0.35) {
-                score -= 200; // Heavily penalize impossible matches
-              }
-            }
-          }
-
-          if (score > bestScore) {
-            bestScore = score;
-            bestFood = food;
-          }
-        }
-
-        if (bestFood && bestScore > -100) {
-          let multiplier = quantity;
-          let estimatedWeightGrams = quantity * (dictEntry?.defaultWeightGramsPerPiece || 100);
-
-          if (unit.toLowerCase() === 'g' || unit.toLowerCase() === 'ml') {
-             multiplier = quantity / 100;
-             estimatedWeightGrams = quantity;
-          } else {
-            const portion = bestFood.foodPortions?.find((p: any) => p.gramWeight);
-            if (portion && portion.gramWeight) {
-              estimatedWeightGrams = quantity * portion.gramWeight;
-              multiplier = estimatedWeightGrams / 100;
-            } else {
-              multiplier = estimatedWeightGrams / 100;
-            }
-          }
-
-          const getNutrient = (id: number) => {
-            const nut = bestFood.foodNutrients.find((n: any) => n.nutrientId === id);
-            return nut ? nut.value * multiplier : 0;
-          };
-
-          detectedFoods.push({
-            foodName: bestFood.description,
-            quantity,
-            unit,
-            estimatedWeightGrams: Math.round(estimatedWeightGrams),
-            calories: Math.round(getNutrient(1008)),
-            protein: Math.round(getNutrient(1003)),
-            carbs: Math.round(getNutrient(1005)),
-            fat: Math.round(getNutrient(1004)),
-            fiber: Math.round(getNutrient(1079)),
-            confidence: 90,
-            source: 'USDA Database (Smart Rank)'
-          });
-        }
-      }
-    } catch (err) {
-      console.error('USDA search failed:', err);
-    }
+  if (unit.toLowerCase() === 'g' || unit.toLowerCase() === 'ml') {
+    estWeight = quantity;
+    m100 = quantity / 100;
+    mPiece = quantity / defaultWeightGrams;
+  } else if (unit.toLowerCase() === 'kg' || unit.toLowerCase() === 'l' || unit.toLowerCase() === 'liter') {
+    estWeight = quantity * 1000;
+    m100 = estWeight / 100;
+    mPiece = estWeight / defaultWeightGrams;
   }
+  
+  return { estWeight, multiplier100g: m100, multiplierPiece: mPiece };
+}
 
-  if (detectedFoods.length > 0) {
-    console.log('[Parser] Success');
+async function searchUSDA(query: string, quantity: number, unit: string, expectedCalsPer100g?: number | null, defaultWeight?: number): Promise<AnalyzedFood | null> {
+  try {
+    const apiKey = process.env.USDA_API_KEY || 'DEMO_KEY';
+    const url = `https://api.nal.usda.gov/fdc/v1/foods/search?query=${encodeURIComponent(query)}&api_key=${apiKey}&pageSize=20`;
+    const response = await axios.get(url);
+
+    if (response.data && response.data.foods && response.data.foods.length > 0) {
+      let bestFood = null;
+      let bestScore = -9999;
+
+      for (const food of response.data.foods) {
+        let score = 0;
+        const descLower = food.description.toLowerCase();
+        
+        const coreEntity = query.replace(/boiled|cooked|raw|fresh|fried|steamed|grilled|roasted/gi, '').trim().toLowerCase();
+        if (coreEntity) {
+          const coreWords = coreEntity.split(/\s+/);
+          const hasCoreMatch = coreWords.some(word => descLower.includes(word));
+          if (hasCoreMatch) score += 500;
+          else score -= 500;
+        }
+
+        if (descLower === query.toLowerCase()) score += 50;
+        else if (descLower.includes(query.toLowerCase())) score += 20;
+
+        const positiveMods = ['raw', 'fresh', 'cooked', 'boiled', 'steamed', 'grilled', 'roasted', 'fried', 'curry'];
+        for (const mod of positiveMods) {
+          if (query.includes(mod) && descLower.includes(mod)) score += 20;
+        }
+
+        if (query.includes('boiled') && (descLower.includes('raw') || descLower.includes('fried'))) score -= 50;
+        if (query.includes('raw') && (descLower.includes('cooked') || descLower.includes('boiled'))) score -= 50;
+        if (query.includes('fried') && (descLower.includes('raw') || descLower.includes('boiled'))) score -= 50;
+
+        const negativeMods = ['powder', 'dehydrated', 'freeze dried', 'chips', 'snack', 'mix', 'supplement', 'protein', 'formula', 'extract', 'flour', 'beverage', 'drink'];
+        for (const mod of negativeMods) {
+          if (!query.includes(mod) && descLower.includes(mod)) score -= 100;
+        }
+
+        if (expectedCalsPer100g) {
+          const calNut = food.foodNutrients.find((n: any) => n.nutrientId === 1008);
+          if (calNut) {
+            const diff = Math.abs(calNut.value - expectedCalsPer100g);
+            if (diff > expectedCalsPer100g * 0.35) score -= 200; 
+          }
+        }
+
+        if (score > bestScore) {
+          bestScore = score;
+          bestFood = food;
+        }
+      }
+
+      if (bestFood && bestScore > -100) {
+        const { estWeight, multiplier100g } = getMultiplier(quantity, unit, defaultWeight || 100);
+        let multiplier = multiplier100g;
+        let finalWeight = estWeight;
+
+        if (unit.toLowerCase() !== 'g' && unit.toLowerCase() !== 'ml') {
+          const portion = bestFood.foodPortions?.find((p: any) => p.gramWeight);
+          if (portion && portion.gramWeight) {
+            finalWeight = quantity * portion.gramWeight;
+            multiplier = finalWeight / 100;
+          }
+        }
+
+        const getNutrient = (id: number) => {
+          const nut = bestFood.foodNutrients.find((n: any) => n.nutrientId === id);
+          return nut ? nut.value * multiplier : 0;
+        };
+
+        return {
+          foodName: bestFood.description,
+          quantity,
+          unit,
+          estimatedWeightGrams: Math.round(finalWeight),
+          calories: Math.round(getNutrient(1008)),
+          protein: Math.round(getNutrient(1003)),
+          carbs: Math.round(getNutrient(1005)),
+          fat: Math.round(getNutrient(1004)),
+          fiber: Math.round(getNutrient(1079)),
+          confidence: 90,
+          source: 'USDA Database'
+        };
+      }
+    }
+  } catch (err) {
+    console.error('USDA search failed:', err);
+  }
+  return null;
+}
+
+async function searchOpenFoodFacts(query: string, quantity: number, unit: string): Promise<AnalyzedFood | null> {
+  try {
+    const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=3`;
+    const response = await axios.get(url, {
+      headers: {
+        'User-Agent': 'SoloLevelingApp - Web - Version 1.0 - www.sololeveling.app'
+      },
+      timeout: 10000
+    });
+    
+    if (response.data && response.data.products && response.data.products.length > 0) {
+      const product = response.data.products[0];
+      const nutriments = product.nutriments || {};
+      
+      const cals100g = nutriments['energy-kcal_100g'] || 0;
+      if (cals100g === 0) return null;
+
+      const prot100g = nutriments['proteins_100g'] || 0;
+      const carb100g = nutriments['carbohydrates_100g'] || 0;
+      const fat100g = nutriments['fat_100g'] || 0;
+      const fiber100g = nutriments['fiber_100g'] || 0;
+
+      const defaultWeight = product.product_quantity ? parseFloat(product.product_quantity) : 100;
+      const { estWeight, multiplier100g } = getMultiplier(quantity, unit, defaultWeight);
+
+      return {
+         foodName: product.product_name || query,
+         quantity,
+         unit,
+         estimatedWeightGrams: Math.round(estWeight),
+         calories: Math.round(cals100g * multiplier100g),
+         protein: Math.round(prot100g * multiplier100g),
+         carbs: Math.round(carb100g * multiplier100g),
+         fat: Math.round(fat100g * multiplier100g),
+         fiber: Math.round(fiber100g * multiplier100g),
+         confidence: 85,
+         source: 'OpenFoodFacts'
+      };
+    }
+  } catch (err) {
+    console.error('OFF search failed', err);
+  }
+  return null;
+}
+
+// Unified Database Resolver
+async function resolveFoodDatabase(rawName: string, quantity: number, unit: string): Promise<AnalyzedFood | null> {
+  const foodName = rawName.trim().toLowerCase();
+  const singularName = foodName.endsWith('s') && !foodName.endsWith('ss') ? foodName.slice(0, -1) : foodName;
+  const dictEntry = LOCAL_FOOD_DICT[foodName] || LOCAL_FOOD_DICT[singularName];
+
+  // 1. IFCT / NIN Local Dictionary
+  if (dictEntry && dictEntry.isHardcoded) {
+    const { estWeight, multiplier100g, multiplierPiece } = getMultiplier(quantity, unit, dictEntry.defaultWeightGramsPerPiece || 100);
+    const macros = dictEntry.macrosPerPiece || dictEntry.macrosPer100g || { cals: 0, prot: 0, fat: 0, carb: 0, fiber: 0 };
+    const multiplier = dictEntry.macrosPerPiece ? multiplierPiece : multiplier100g;
+
     return {
-      detectedFoods,
-      systemAnalysis: "SYSTEM ANALYSIS: Target acquired and mapped perfectly via internal parser. No AI processing required.",
-      waterRecommendationMl: 0,
-      totalCalories: detectedFoods.reduce((acc, f) => acc + f.calories, 0),
-      totalProtein: detectedFoods.reduce((acc, f) => acc + f.protein, 0),
-      totalCarbs: detectedFoods.reduce((acc, f) => acc + f.carbs, 0),
-      totalFat: detectedFoods.reduce((acc, f) => acc + f.fat, 0)
+      foodName: dictEntry.search,
+      quantity,
+      unit,
+      estimatedWeightGrams: Math.round(estWeight),
+      calories: Math.round(macros.cals * multiplier),
+      protein: Math.round(macros.prot * multiplier),
+      carbs: Math.round(macros.carb * multiplier),
+      fat: Math.round(macros.fat * multiplier),
+      fiber: Math.round(macros.fiber * multiplier),
+      confidence: 100,
+      source: 'IFCT / NIN Database'
     };
   }
+
+  const searchQuery = dictEntry ? dictEntry.search : foodName;
+
+  // 2. USDA FDC
+  const usdaResult = await searchUSDA(searchQuery, quantity, unit, dictEntry?.expectedCalsPer100g, dictEntry?.defaultWeightGramsPerPiece);
+  if (usdaResult) return usdaResult;
+
+  // 3. OpenFoodFacts
+  const offResult = await searchOpenFoodFacts(foodName, quantity, unit);
+  if (offResult) return offResult;
 
   return null;
 }
 
-async function callGroq(prompt: string): Promise<NutritionAnalysisResult> {
+async function callGroqEntities(prompt: string): Promise<any> {
   const response = await axios.post(
     'https://api.groq.com/openai/v1/chat/completions',
     {
       model: 'llama3-70b-8192',
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        { role: 'user', content: prompt }
-      ],
+      messages: [{ role: 'system', content: SYSTEM_PROMPT }, { role: 'user', content: prompt }],
       response_format: { type: 'json_object' }
     },
-    {
-      headers: {
-        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      timeout: 10000
-    }
+    { headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 'Content-Type': 'application/json' }, timeout: 10000 }
   );
-
-  const textResponse = response.data.choices[0].message.content;
-  return JSON.parse(textResponse) as NutritionAnalysisResult;
+  return JSON.parse(response.data.choices[0].message.content);
 }
 
-async function callOpenRouter(prompt: string): Promise<NutritionAnalysisResult> {
+async function callOpenRouterEntities(prompt: string): Promise<any> {
   const response = await axios.post(
     'https://openrouter.ai/api/v1/chat/completions',
     {
       model: 'meta-llama/llama-3-70b-instruct',
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        { role: 'user', content: prompt }
-      ],
+      messages: [{ role: 'system', content: SYSTEM_PROMPT }, { role: 'user', content: prompt }],
       response_format: { type: 'json_object' }
     },
-    {
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://sololeveling.app'
-      },
-      timeout: 15000
-    }
+    { headers: { 'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`, 'Content-Type': 'application/json', 'HTTP-Referer': 'https://sololeveling.app' }, timeout: 15000 }
   );
-
-  const textResponse = response.data.choices[0].message.content;
-  return JSON.parse(textResponse) as NutritionAnalysisResult;
+  return JSON.parse(response.data.choices[0].message.content);
 }
 
-async function callGemini(prompt: string): Promise<NutritionAnalysisResult> {
-  const ai = getAi();
-  const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
-    contents: `${SYSTEM_PROMPT}\\n\\n${prompt}`,
-    config: {
-      responseMimeType: 'application/json',
-    }
-  });
+async function callGeminiEntities(prompt: string): Promise<any> {
+    const ai = getAi();
+    const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: `${SYSTEM_PROMPT}\n\nUSER INPUT:\n${prompt}`,
+        config: { responseMimeType: 'application/json' }
+    });
+    const textResponse = response.text || '{}';
+    const jsonStr = textResponse.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim();
+    return JSON.parse(jsonStr);
+}
 
-  const textResponse = response.text || '{}';
-  const jsonStr = textResponse.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim();
-  return JSON.parse(jsonStr) as NutritionAnalysisResult;
+async function callAIForEntities(prompt: string): Promise<{ detectedFoods: { foodName: string, quantity: number, unit: string }[] }> {
+    try {
+      if (process.env.GROQ_API_KEY) return await callGroqEntities(prompt);
+      throw new Error('No Groq');
+    } catch (e) {
+      try {
+        if (process.env.OPENROUTER_API_KEY) return await callOpenRouterEntities(prompt);
+        throw new Error('No OpenRouter');
+      } catch (e2) {
+        return await callGeminiEntities(prompt);
+      }
+    }
 }
 
 function getGracefulFallback(): NutritionAnalysisResult {
   return {
     detectedFoods: [],
-    systemAnalysis: "Hunter System temporarily unavailable. Basic nutrition analysis could not be completed.",
+    systemAnalysis: "Hunter System temporarily unavailable. Validation failed.",
     waterRecommendationMl: 0,
-    totalCalories: 0,
-    totalProtein: 0,
-    totalCarbs: 0,
-    totalFat: 0
+    totalCalories: 0, totalProtein: 0, totalCarbs: 0, totalFat: 0
   };
 }
 
 export const analyzeFoodInput = async (text: string): Promise<NutritionAnalysisResult> => {
-  // Priority 1: Local Food Parser
+  let entities: { foodName: string, quantity: number, unit: string }[] = [];
+
+  // Try parsing manually first (Fast path)
   if (text.length < 100) {
-    const localResult = await parseSimpleFood(text);
-    if (localResult) return localResult;
-  }
-
-  const prompt = `USER INPUT:\\n${text}`;
-
-  // Priority 3: Groq API
-  try {
-    if (process.env.GROQ_API_KEY) {
-      console.log('[Groq] Using AI');
-      return await callGroq(prompt);
-    } else {
-      throw new Error('Missing GROQ_API_KEY');
+    const chunks = text.split(/\b(?:and|with|&|,)\b/i).map(c => c.trim()).filter(Boolean);
+    let manualEntities = [];
+    let parsedSuccessfully = true;
+    for (const chunk of chunks) {
+      let qty = 1; let unit = 'piece'; let name = chunk;
+      const match = chunk.match(SIMPLE_FOOD_REGEX);
+      if (match) {
+        qty = parseFloat(match[1]);
+        const potentialUnit = match[2];
+        const rest = match[3];
+        if (potentialUnit && COMMON_UNITS.includes(potentialUnit.toLowerCase())) {
+          unit = potentialUnit; name = rest;
+        } else {
+          name = potentialUnit ? `${potentialUnit} ${rest}` : rest;
+        }
+        manualEntities.push({ foodName: name, quantity: qty, unit });
+      } else {
+        parsedSuccessfully = false;
+        break;
+      }
     }
-  } catch (err: any) {
-    console.log('[Groq] Failed');
-    console.log('Switching to OpenRouter...');
-  }
-
-  // Priority 4: OpenRouter API
-  try {
-    if (process.env.OPENROUTER_API_KEY) {
-      return await callOpenRouter(prompt);
-    } else {
-      throw new Error('Missing OPENROUTER_API_KEY');
+    if (parsedSuccessfully && manualEntities.length > 0) {
+       entities = manualEntities;
     }
-  } catch (err: any) {
-    console.log('[OpenRouter] Failed');
-    console.log('Switching to Gemini...');
   }
 
-  // Priority 5: Gemini API
-  try {
-    if (process.env.GEMINI_API_KEY) {
-      return await callGemini(prompt);
+  // If manual parse failed or it's a long sentence, let AI parse the entities
+  if (entities.length === 0 || text.length >= 100) {
+     try {
+       console.log('[AI] Extracting entities...');
+       const aiResponse = await callAIForEntities(text);
+       entities = aiResponse.detectedFoods || [];
+     } catch (err) {
+       console.error('[AI] Parsing failed.', err);
+       return getGracefulFallback();
+     }
+  }
+
+  // Resolve through Database Waterfall
+  const resolvedFoods: AnalyzedFood[] = [];
+  for (const entity of entities) {
+    const result = await resolveFoodDatabase(entity.foodName, entity.quantity, entity.unit);
+    if (result) {
+       resolvedFoods.push(result);
     } else {
-      throw new Error('Missing GEMINI_API_KEY');
+       // Failed to match any database
+       resolvedFoods.push({
+          foodName: entity.foodName,
+          quantity: entity.quantity,
+          unit: entity.unit,
+          estimatedWeightGrams: 0,
+          calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0,
+          confidence: 0,
+          source: 'Not Found',
+          alternatives: ['Try being more specific']
+       });
     }
-  } catch (err: any) {
-    console.log('[Gemini] Failed');
-    console.log('Returning graceful fallback.');
   }
 
-  // Graceful Fallback
-  return getGracefulFallback();
+  return {
+      detectedFoods: resolvedFoods,
+      systemAnalysis: "SYSTEM ANALYSIS: Target scanned across IFCT, USDA, and OpenFoodFacts databases.",
+      waterRecommendationMl: 0,
+      totalCalories: resolvedFoods.reduce((acc, f) => acc + f.calories, 0),
+      totalProtein: resolvedFoods.reduce((acc, f) => acc + f.protein, 0),
+      totalCarbs: resolvedFoods.reduce((acc, f) => acc + f.carbs, 0),
+      totalFat: resolvedFoods.reduce((acc, f) => acc + f.fat, 0)
+  };
 };
