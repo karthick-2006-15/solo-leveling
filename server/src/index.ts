@@ -4,6 +4,7 @@ import dns from 'node:dns';
 dns.setServers(['8.8.8.8', '1.1.1.1']);
 
 import express from 'express';
+import path from 'path';
 import dotenvSafe from 'dotenv-safe';
 import mongoose from 'mongoose';
 
@@ -135,6 +136,16 @@ async function bootstrap() {
     app.use('/api/achievements', achievementRoutes);
     app.use('/api/assistant', aiRoutes);
     app.use('/api/notifications', notificationRoutes);
+
+    // Serve Frontend in Production
+    if (process.env.NODE_ENV === 'production') {
+      const clientBuildPath = path.join(__dirname, '../../client/dist');
+      app.use(express.static(clientBuildPath));
+      
+      app.get('*', (req, res) => {
+        res.sendFile(path.join(clientBuildPath, 'index.html'));
+      });
+    }
 
     // Register Global Error Handler (MUST BE LAST)
     app.use(globalErrorHandler);
