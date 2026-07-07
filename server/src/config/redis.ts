@@ -4,13 +4,16 @@ import RedisMock from 'ioredis-mock';
 const REDIS_URL = process.env.REDIS_URL;
 const isDev = process.env.NODE_ENV === 'development' || !REDIS_URL;
 
-export const redis = (process.env.QA_MODE === 'true' || isDev)
+const isSecure = REDIS_URL?.startsWith('rediss://');
+
+export let redis = (process.env.QA_MODE === 'true' || isDev)
   ? new RedisMock() 
   : new Redis(REDIS_URL as string, {
       lazyConnect: true,
+      tls: isSecure ? { rejectUnauthorized: false } : undefined,
       retryStrategy(times) {
-        const delay = Math.min(times * 50, 2000);
-        return delay;
+        if (times > 3) return null; // Stop retrying after 3 attempts
+        return Math.min(times * 50, 2000);
       }
     });
 
@@ -29,7 +32,9 @@ export const connectRedis = async () => {
     isRedisConnected = true;
     console.log(isDev ? 'Connected to Redis Cache (Mocked)' : 'Connected to Redis Cache');
   } catch (error) {
-    console.error('Redis connection failed:', error);
+    console.warn('Redis connection failed, falling back to in-memory mock cache.');
+    redis = new RedisMock();
+    isRedisConnected = true;
   }
 };
 
