@@ -2,7 +2,7 @@ import { Response } from 'express';
 import asyncHandler from 'express-async-handler';
 import { AuthRequest } from '../middleware/authMiddleware';
 import WeightLog from '../models/WeightLog';
-import ProgressionProfile from '../models/ProgressionProfile';
+import _ProgressionProfile from '../models/ProgressionProfile';
 import { AppError } from '../utils/AppError';
 import { missionService } from '../services/missionService';
 import { checkAchievements } from '../services/progressionService';

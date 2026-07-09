@@ -40,7 +40,7 @@ export const Nutrition: React.FC = () => {
       gainNode.connect(audioCtx.destination);
       oscillator.start();
       oscillator.stop(audioCtx.currentTime + duration);
-    } catch(e) {}
+    } catch(e) { console.debug(e); }
   };
 
   const playScanStart = () => playSound(600, 'sine', 0.8);
@@ -90,7 +90,8 @@ export const Nutrition: React.FC = () => {
     carbs: 0,
     fat: 0,
     fiber: 0,
-    sugar: 0
+    sugar: 0,
+    sodium: 0
   });
 
   // Modals and Toasts
@@ -106,8 +107,11 @@ export const Nutrition: React.FC = () => {
   // Calculate today's totals from logs
   const todayCalories = logs.reduce((sum: number, log: any) => sum + log.nutrients.calories, 0);
   const todayProtein = logs.reduce((sum: number, log: any) => sum + log.nutrients.protein, 0);
-  const todayCarbs = logs.reduce((sum: number, log: any) => sum + log.nutrients.carbs, 0);
-  const todayFat = logs.reduce((sum: number, log: any) => sum + log.nutrients.fat, 0);
+  const todayCarbs = logs.reduce((sum: number, log: any) => sum + (log.nutrients.carbs || 0), 0);
+  const todayFat = logs.reduce((sum: number, log: any) => sum + (log.nutrients.fat || 0), 0);
+  const todayFiber = logs.reduce((sum: number, log: any) => sum + (log.nutrients.fiber || 0), 0);
+  const todaySugar = logs.reduce((sum: number, log: any) => sum + (log.nutrients.sugar || 0), 0);
+  const todaySodium = logs.reduce((sum: number, log: any) => sum + (log.nutrients.sodium || 0), 0);
 
   const handleConfirmMeal = async () => {
     if (!analysisResult || analysisResult.detectedFoods.length === 0) return;
@@ -154,14 +158,15 @@ export const Nutrition: React.FC = () => {
           carbs: Number(manualForm.carbs),
           fat: Number(manualForm.fat),
           fiber: Number(manualForm.fiber),
-          sugar: Number(manualForm.sugar)
+          sugar: Number(manualForm.sugar),
+          sodium: Number(manualForm.sodium || 0)
         },
         source: 'manual' as const
       };
 
       const result = await logManualFood(data);
       handleXPResult(result);
-      setManualForm({ name: '', calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0 });
+      setManualForm({ name: '', calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0 } as any);
     } catch {
       alert("Failed to log manual food.");
     }
@@ -237,6 +242,20 @@ export const Nutrition: React.FC = () => {
               <HunterMissionRing label="Protein" current={todayProtein} max={proteinTarget} unit="G" colorHex="#818cf8" size={100} strokeWidth={6} />
               <HunterMissionRing label="Carbs" current={todayCarbs} max={250} unit="G" colorHex="#38bdf8" size={100} strokeWidth={6} />
               <HunterMissionRing label="Fat" current={todayFat} max={70} unit="G" colorHex="#60a5fa" size={100} strokeWidth={6} />
+            </div>
+            <div className="grid grid-cols-3 gap-2 pb-4 px-2">
+              <div className="text-center bg-black/40 border border-cyan-900/30 rounded p-2">
+                <div className="text-[9px] font-mono text-gray-500 uppercase">Fiber</div>
+                <div className="text-cyan-400 font-display">{todayFiber.toFixed(1)}g</div>
+              </div>
+              <div className="text-center bg-black/40 border border-cyan-900/30 rounded p-2">
+                <div className="text-[9px] font-mono text-gray-500 uppercase">Sugar</div>
+                <div className="text-purple-400 font-display">{todaySugar.toFixed(1)}g</div>
+              </div>
+              <div className="text-center bg-black/40 border border-cyan-900/30 rounded p-2">
+                <div className="text-[9px] font-mono text-gray-500 uppercase">Sodium</div>
+                <div className="text-yellow-400 font-display">{todaySodium.toFixed(0)}mg</div>
+              </div>
             </div>
           </SystemWindow>
 
@@ -358,6 +377,10 @@ export const Nutrition: React.FC = () => {
                     <label className="text-[9px] font-mono tracking-widest text-[var(--color-system-text-dim)] uppercase">Sugar (g)</label>
                     <input type="number" min="0" value={manualForm.sugar || ''} onChange={e => setManualForm({...manualForm, sugar: Number(e.target.value)})} className="w-full bg-[rgba(0,0,0,0.5)] border border-[rgba(255,255,255,0.1)] focus:border-[var(--color-system-blue)] text-white p-2 mt-1 text-[12px] font-mono text-center outline-none transition-colors" />
                   </div>
+                  <div>
+                    <label className="text-[9px] font-mono tracking-widest text-[var(--color-system-text-dim)] uppercase">Sodium (mg)</label>
+                    <input type="number" min="0" value={(manualForm as any).sodium || ''} onChange={e => setManualForm({...manualForm, sodium: Number(e.target.value)} as any)} className="w-full bg-[rgba(0,0,0,0.5)] border border-[rgba(255,255,255,0.1)] focus:border-[var(--color-system-blue)] text-white p-2 mt-1 text-[12px] font-mono text-center outline-none transition-colors" />
+                  </div>
                 </div>
                 <PrimaryButton type="submit" fullWidth className="mt-4 !py-3">LOG MANUAL ENTRY</PrimaryButton>
               </form>
@@ -392,7 +415,7 @@ export const Nutrition: React.FC = () => {
             <div className="absolute inset-0 bg-black/60 pointer-events-none" />
             <div className="flex-1 min-h-0 w-full relative z-10">
               {graphData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="99%" height="100%">
                   <AreaChart data={graphData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorCal" x1="0" y1="0" x2="0" y2="1">

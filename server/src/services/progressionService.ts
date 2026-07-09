@@ -118,7 +118,7 @@ export const awardXP = async (userId: string, source: string, amount: number): P
   await xpLogRepository.create(userId, source, amount);
 
   let leveledUp = false;
-  const initialLevel = profile.level;
+  const _initialLevel = profile.level;
   const initialRank = profile.rank;
 
   while (profile.currentXP >= xpRequiredForLevel(profile.level)) {

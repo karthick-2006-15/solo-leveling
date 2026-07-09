@@ -18,6 +18,13 @@ export interface ProgressionData {
   coins: number;
   currentStreak: number;
   longestStreak: number;
+  dailyXP?: number;
+  weeklyXP?: number;
+  monthlyXP?: number;
+  skillPoints?: number;
+  hunterScore?: number;
+  activeTitle?: string;
+  unlockedTitles?: string[];
   unlockedAchievements: Array<{ achievementId: string; unlockedAt: string }>;
 }
 

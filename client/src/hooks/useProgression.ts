@@ -21,6 +21,13 @@ export const useProgression = () => {
       coins: 0,
       currentStreak: 0,
       longestStreak: 0,
+      dailyXP: 0,
+      weeklyXP: 0,
+      monthlyXP: 0,
+      skillPoints: 0,
+      hunterScore: 0,
+      activeTitle: 'Beginner Hunter',
+      unlockedTitles: ['Beginner Hunter'],
       unlockedAchievements: []
     }
   });

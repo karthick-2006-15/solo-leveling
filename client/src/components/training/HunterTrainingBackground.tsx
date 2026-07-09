@@ -9,7 +9,7 @@ export const HunterTrainingBackground: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let particles: { x: number; y: number; vx: number; vy: number; size: number; alpha: number; color: string }[] = [];
+    const particles: { x: number; y: number; vx: number; vy: number; size: number; alpha: number; color: string }[] = [];
     let animationFrameId: number;
 
     const resize = () => {

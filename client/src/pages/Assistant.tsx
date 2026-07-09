@@ -180,7 +180,7 @@ export const Assistant: React.FC = () => {
                 });
                 play('error');
               }
-            } catch (err) {
+            } catch {
               // Ignore partial JSON chunks until they complete
             }
           }
@@ -339,7 +339,7 @@ export const Assistant: React.FC = () => {
               {isListening && (
                 <div className="absolute right-16 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
                   {[1,2,3,4].map(idx => (
-                    <div key={idx} className="w-0.5 bg-cyan-400 animate-[bounce_1s_infinite]" style={{ height: `${Math.random() * 12 + 4}px`, animationDelay: `${idx * 0.1}s` }} />
+                    <div key={idx} className="w-0.5 bg-cyan-400 animate-[bounce_1s_infinite]" style={{ height: `${(idx * 3 % 12) + 4}px`, animationDelay: `${idx * 0.1}s` }} />
                   ))}
                 </div>
               )}

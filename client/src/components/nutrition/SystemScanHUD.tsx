@@ -12,6 +12,7 @@ export const SystemScanHUD: React.FC<SystemScanHUDProps> = ({ isScanning, inputT
 
   useEffect(() => {
     if (!isScanning) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setProgress(0);
       return;
     }

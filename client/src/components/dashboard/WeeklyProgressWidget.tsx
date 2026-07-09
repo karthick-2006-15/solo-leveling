@@ -19,8 +19,8 @@ export const WeeklyProgressWidget: React.FC = () => {
   if (!data || data.length === 0) return <div className="text-textMuted text-sm">No activity this week</div>;
 
   return (
-    <div className="w-full h-full p-2">
-      <ResponsiveContainer width="100%" height="100%">
+    <div className="w-full h-48 min-h-[200px] p-2">
+      <ResponsiveContainer width="99%" height="100%">
         <LineChart data={data}>
           <Tooltip 
             contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #4a00e0', borderRadius: '8px', padding: '4px' }}

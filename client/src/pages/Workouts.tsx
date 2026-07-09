@@ -436,7 +436,7 @@ export const Workouts: React.FC = () => {
                 </h2>
                 <div className="bg-black/60 border border-cyan-900/50 rounded backdrop-blur-md h-80 p-6">
                   {graphData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="99%" height="100%">
                       <AreaChart data={graphData}>
                         <defs>
                           <linearGradient id="colorVolume" x1="0" y1="0" x2="0" y2="1">

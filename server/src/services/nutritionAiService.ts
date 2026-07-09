@@ -341,11 +341,11 @@ async function callAIForEntities(prompt: string): Promise<{ detectedFoods: { foo
     try {
       if (process.env.GROQ_API_KEY) return await callGroqEntities(prompt);
       throw new Error('No Groq');
-    } catch (e) {
+    } catch (_e) {
       try {
         if (process.env.OPENROUTER_API_KEY) return await callOpenRouterEntities(prompt);
-        throw new Error('No OpenRouter');
-      } catch (e2) {
+        throw new Error('No OpenRouter', { cause: _e });
+      } catch (_e2) {
         return await callGeminiEntities(prompt);
       }
     }
@@ -366,15 +366,16 @@ export const analyzeFoodInput = async (text: string): Promise<NutritionAnalysisR
   // Try parsing manually first (Fast path)
   if (text.length < 100) {
     const chunks = text.split(/\b(?:and|with|&|,)\b/i).map(c => c.trim()).filter(Boolean);
-    let manualEntities = [];
+    const manualEntities = [];
     let parsedSuccessfully = true;
     for (const chunk of chunks) {
-      let qty = 1; let unit = 'piece'; let name = chunk;
       const match = chunk.match(SIMPLE_FOOD_REGEX);
       if (match) {
-        qty = parseFloat(match[1]);
+        const qty = parseFloat(match[1]);
         const potentialUnit = match[2];
         const rest = match[3];
+        let unit = 'piece';
+        let name;
         if (potentialUnit && COMMON_UNITS.includes(potentialUnit.toLowerCase())) {
           unit = potentialUnit; name = rest;
         } else {

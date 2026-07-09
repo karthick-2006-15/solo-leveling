@@ -8,6 +8,9 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { AnimatedRoutes } from './components/AnimatedRoutes';
 import { GlobalFloatingAIButton } from './components/ui/GlobalFloatingAIButton';
 import { SystemBootSequence } from './components/ui/SystemBootSequence';
+import { LevelUpCinematic } from './components/ui/LevelUpCinematic';
+import { BossWarning } from './components/ui/BossWarning';
+import { DungeonPortal } from './components/ui/DungeonPortal';
 import { HunterTrainingBackground } from './components/training/HunterTrainingBackground';
 import { SettingsProvider } from './contexts/SettingsContext';
 
@@ -26,11 +29,11 @@ const queryClient = new QueryClient({
 function App() {
   // Check if we've already booted this session
   const [hasBooted, setHasBooted] = useState(() => {
-    return sessionStorage.getItem('systemBooted') === 'true';
+    return localStorage.getItem('systemBooted') === 'true';
   });
 
   const handleBootComplete = () => {
-    sessionStorage.setItem('systemBooted', 'true');
+    localStorage.setItem('systemBooted', 'true');
     setHasBooted(true);
   };
 
@@ -38,6 +41,11 @@ function App() {
     <SettingsProvider>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
+          {/* Cinematic Overlays */}
+          <LevelUpCinematic />
+          <BossWarning />
+          <DungeonPortal />
+
           <div className="min-h-screen flex flex-col relative overflow-hidden bg-[var(--color-system-black)] pb-16 md:pb-0 md:pt-16 selection:bg-cyan-900 selection:text-white">
             
             {!hasBooted && <SystemBootSequence onComplete={handleBootComplete} />}

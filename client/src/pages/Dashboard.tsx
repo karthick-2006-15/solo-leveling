@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Zap, Target, Star, Activity, ShieldCheck } from 'lucide-react';
+import { Shield, Zap, Target, Star, Activity } from 'lucide-react';
 
 import { useProgression } from '../hooks/useProgression';
 import { useHabits } from '../hooks/useHabits';
@@ -9,6 +9,8 @@ import { useNutrition } from '../hooks/useNutrition';
 import { useSkills } from '../hooks/useSkills';
 import { useMissions } from '../hooks/useMissions';
 import { useAuthStore } from '../store/useAuthStore';
+import { useEconomy } from '../hooks/useEconomy';
+import { Link } from 'react-router-dom';
 
 import { LevelUpModal } from '../components/ui/LevelUpModal';
 import { AchievementToast, type ToastData } from '../components/ui/AchievementToast';
@@ -18,6 +20,9 @@ import { QuickActionsWidget } from '../components/dashboard/QuickActionsWidget';
 import { CalendarWidget } from '../components/dashboard/CalendarWidget';
 import { WeeklyProgressWidget } from '../components/dashboard/WeeklyProgressWidget';
 import { RecentAchievements } from '../components/dashboard/RecentAchievements';
+import { MissionBoard } from '../components/missions/MissionBoard';
+import { DailyLoginBanner } from '../components/dashboard/DailyLoginBanner';
+import { PerfectDayWidget } from '../components/dashboard/PerfectDayWidget';
 
 export const Dashboard: React.FC = () => {
   const { user } = useAuthStore();
@@ -26,7 +31,8 @@ export const Dashboard: React.FC = () => {
   const { isLoading: workLoading } = useWorkouts();
   const { logs: foodLogs, isLoading: nutLoading } = useNutrition();
   const { skills, isLoading: skillsLoading } = useSkills();
-  const { boss, questsLoading, bossLoading } = useMissions();
+  const { quests, boss, questsLoading, bossLoading } = useMissions();
+  const { timeline } = useEconomy();
 
   const [levelUpData, setLevelUpData] = useState<{isOpen: boolean, level: number, rank?: string, rankChanged?: boolean}>({ isOpen: false, level: 0 });
   const [toasts, setToasts] = useState<ToastData[]>([]);
@@ -50,6 +56,14 @@ export const Dashboard: React.FC = () => {
   const habitsCompleted = habits.filter((h: any) => h.completedToday).length;
   const habitsActive = habits.filter((h: any) => h.active).length;
 
+  const allQuestsCompleted = quests ? quests.every((q: any) => q.status === 'completed') : false;
+  
+  // Checking today's perfect day claim
+  const todayStr = new Date().toDateString();
+  const hasClaimedPerfectDay = timeline ? timeline.some((log: any) => 
+    log.source === 'perfect_day' && new Date(log.createdAt).toDateString() === todayStr
+  ) : false;
+
   const handleDevAward = async (amount: number) => {
     try {
       const result = await awardDevXP({ source: 'dev_test', amount });
@@ -72,6 +86,8 @@ export const Dashboard: React.FC = () => {
       <AchievementToast toasts={toasts} removeToast={removeToast} />
       <LevelUpModal isOpen={levelUpData.isOpen} onClose={() => setLevelUpData({ ...levelUpData, isOpen: false })} newLevel={levelUpData.level} newRank={levelUpData.rank} rankChanged={levelUpData.rankChanged} />
 
+      <DailyLoginBanner />
+
       {/* TOP HEADER STATUS */}
       <motion.div 
         initial={{ y: -20, opacity: 0 }} 
@@ -90,9 +106,14 @@ export const Dashboard: React.FC = () => {
               <h1 className="text-3xl md:text-5xl font-display font-bold text-white tracking-[0.2em] uppercase text-shadow-glow">
                 {user?.name || 'HUNTER'}
               </h1>
-              <p className="font-mono text-cyan-500 text-[11px] tracking-[0.4em] uppercase mt-2 opacity-80">
-                System Synchronized • Status: Optimal
-              </p>
+              <div className="flex items-center gap-3 mt-2">
+                <span className="font-mono text-cyan-400 text-xs tracking-widest uppercase border border-cyan-900/50 bg-cyan-950/30 px-3 py-1 rounded-full">
+                  {progression.activeTitle || 'Beginner Hunter'}
+                </span>
+                <p className="font-mono text-cyan-500 text-[11px] tracking-[0.4em] uppercase opacity-80">
+                  System Synchronized
+                </p>
+              </div>
             </div>
 
             {/* Glowing XP Bar */}
@@ -117,10 +138,10 @@ export const Dashboard: React.FC = () => {
 
         {/* Quick Stats Banner */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-6 border-t border-cyan-900/30">
-           <div className="text-center">
-             <div className="text-[10px] font-mono text-cyan-700 uppercase tracking-widest mb-1">Total Credits</div>
-             <div className="font-display text-xl text-cyan-100"><RollingNumber value={coins} /> C</div>
-           </div>
+           <Link to="/economy" className="text-center group block cursor-pointer">
+             <div className="text-[10px] font-mono text-cyan-700 uppercase tracking-widest mb-1 group-hover:text-cyan-400 transition-colors">Total Credits</div>
+             <div className="font-display text-xl text-cyan-100 group-hover:text-white transition-colors"><RollingNumber value={coins} /> C</div>
+           </Link>
            <div className="text-center border-l border-cyan-900/30">
              <div className="text-[10px] font-mono text-cyan-700 uppercase tracking-widest mb-1">Consecutive Days</div>
              <div className="font-display text-xl text-cyan-100"><RollingNumber value={currentStreak} /></div>
@@ -166,35 +187,10 @@ export const Dashboard: React.FC = () => {
       {/* MIDDLE SECTION: VITAL SYSTEMS */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Daily Quests Summary */}
-        <motion.div 
-          initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}
-          className="lg:col-span-2 bg-black/60 border border-cyan-900/50 rounded-2xl p-6 backdrop-blur-xl relative"
-        >
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="font-display uppercase tracking-[0.2em] text-cyan-500 flex items-center gap-2">
-              <Target className="w-5 h-5" /> Mission Status
-            </h2>
-            <span className="font-mono text-[10px] text-gray-500 uppercase tracking-widest">{habitsCompleted} / {habitsActive} ACTIVE</span>
-          </div>
-
-          <div className="space-y-4">
-            {habits.slice(0, 4).map((h: any) => (
-              <div key={h._id} className="relative bg-cyan-950/20 border border-cyan-900/30 rounded p-4 flex justify-between items-center group hover:border-cyan-500/50 transition-colors">
-                <div className="flex items-center gap-4">
-                  <div className={`w-3 h-3 rounded-sm border ${h.completedToday ? 'bg-cyan-400 border-cyan-400 shadow-[0_0_10px_#00d4ff]' : 'border-cyan-800'}`} />
-                  <span className={`font-mono text-sm tracking-wider uppercase ${h.completedToday ? 'text-gray-500 line-through' : 'text-cyan-50'}`}>{h.title}</span>
-                </div>
-                {h.completedToday && <ShieldCheck className="w-4 h-4 text-cyan-500 opacity-50" />}
-              </div>
-            ))}
-            {habits.length === 0 && (
-              <div className="py-8 text-center border border-dashed border-cyan-900/50 rounded">
-                <p className="font-mono text-[10px] text-gray-600 uppercase tracking-widest">No Active Missions</p>
-              </div>
-            )}
-          </div>
-        </motion.div>
+        {/* Daily Adaptive Quests Summary */}
+        <div className="lg:col-span-2">
+          <MissionBoard />
+        </div>
 
         {/* System Vitals */}
         <motion.div 
@@ -300,8 +296,13 @@ export const Dashboard: React.FC = () => {
             <CalendarWidget />
           </div>
         </div>
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 space-y-6">
           <RecentAchievements achievements={unlockedAchievements} />
+          <PerfectDayWidget 
+            missionsCompleted={allQuestsCompleted} 
+            recoveryPassed={true /* We need recovery score here, mock or fetch */} 
+            hasClaimed={hasClaimedPerfectDay} 
+          />
         </div>
       </div>
     </div>

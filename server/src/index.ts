@@ -16,7 +16,7 @@ process.on('uncaughtException', (err) => {
   process.exit(1);
 });
 
-process.on('unhandledRejection', (reason: any, promise) => {
+process.on('unhandledRejection', (reason: any, _promise) => {
   console.error('\n[CRASH] 💥 UNHANDLED REJECTION! Shutting down...');
   if (reason instanceof Error) {
     console.error(reason.name, reason.message);

@@ -17,7 +17,7 @@ export let redis = (process.env.QA_MODE === 'true' || isDev)
       }
     });
 
-redis.on('error', (err) => {
+redis.on('error', (_err) => {
   // Suppress connection errors if redis is not running locally
 });
 
@@ -31,7 +31,7 @@ export const connectRedis = async () => {
     }
     isRedisConnected = true;
     console.log(isDev ? 'Connected to Redis Cache (Mocked)' : 'Connected to Redis Cache');
-  } catch (error) {
+  } catch (_error) {
     console.warn('Redis connection failed, falling back to in-memory mock cache.');
     redis = new RedisMock();
     isRedisConnected = true;

@@ -190,7 +190,7 @@ export const DSA: React.FC = () => {
               <h2 className="font-mono text-[10px] text-indigo-400 uppercase tracking-[0.3em] mb-4 text-center">Threat Level Distribution</h2>
               <div className="h-48">
                 {stats?.totalSolved > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="99%" height="100%">
                     <PieChart>
                       <Pie data={[
                         { name: 'E-Rank (Easy)', value: stats.difficultyCounts.easy || 0 },
@@ -220,7 +220,7 @@ export const DSA: React.FC = () => {
               <h2 className="font-mono text-[10px] text-indigo-400 uppercase tracking-[0.3em] mb-4 text-center">Topic Mastery</h2>
               <div className="h-48">
                 {stats?.totalSolved > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="99%" height="100%">
                     <BarChart data={Object.entries(stats.topicCounts || {}).map(([name, count]) => ({ name, count }))} layout="vertical" margin={{ left: -20, right: 10 }}>
                       <XAxis type="number" hide />
                       <Bar dataKey="count" fill="#818cf8" radius={[0, 4, 4, 0]} />

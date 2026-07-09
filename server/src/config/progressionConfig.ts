@@ -77,7 +77,7 @@ export const ACHIEVEMENTS: AchievementConfig[] = [
     name: 'First Workout',
     description: 'Log your very first workout.',
     icon: '💪',
-    trigger: async (userId, profile) => {
+    trigger: async (userId, _profile) => {
       const count = await WorkoutSession.countDocuments({ userId });
       return count > 0;
     }
@@ -87,7 +87,7 @@ export const ACHIEVEMENTS: AchievementConfig[] = [
     name: 'First PR',
     description: 'Set your first Personal Record.',
     icon: '🏆',
-    trigger: async (userId, profile) => {
+    trigger: async (userId, _profile) => {
       const count = await PersonalRecord.countDocuments({ userId });
       return count > 0;
     }
@@ -97,7 +97,7 @@ export const ACHIEVEMENTS: AchievementConfig[] = [
     name: '100 DSA Problems',
     description: 'Solve 100 Data Structures & Algorithms problems.',
     icon: '🧠',
-    trigger: async (userId, profile) => {
+    trigger: async (userId, _profile) => {
       const count = await DSAProblem.countDocuments({ userId });
       return count >= 100;
     }
@@ -107,7 +107,7 @@ export const ACHIEVEMENTS: AchievementConfig[] = [
     name: 'Page Turner',
     description: 'Complete your Reading habit 10 times.',
     icon: '📚',
-    trigger: async (userId, profile) => {
+    trigger: async (userId, _profile) => {
       const count = await HabitCompletion.countDocuments({ userId, habitKey: 'read' });
       return count >= 10;
     }

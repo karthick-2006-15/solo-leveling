@@ -6,7 +6,7 @@ import FoodLog from '../models/FoodLog';
 import WaterLog from '../models/WaterLog';
 import DSAProblem from '../models/DSAProblem';
 import HabitCompletion from '../models/HabitCompletion';
-import Habit from '../models/Habit';
+import _Habit from '../models/Habit';
 import StudySession from '../models/StudySession';
 import { userRepository } from '../repositories/userRepository';
 import { QUEST_TEMPLATES } from '../config/questTemplates';

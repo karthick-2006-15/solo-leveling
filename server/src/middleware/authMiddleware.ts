@@ -30,7 +30,7 @@ export const requireAuth = (req: AuthRequest, res: Response, next: NextFunction)
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'supersecret_jwt_key') as { id: string };
     req.user = { id: decoded.id };
     next();
-  } catch (error) {
+  } catch (_error) {
     return next(new AppError('Unauthorized: Invalid token', 401));
   }
 };

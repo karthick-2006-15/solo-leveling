@@ -1,7 +1,7 @@
 import http from 'http';
 
 let token = '';
-const userId = '6662e086f6fcd153641ec923';
+const _userId = '6662e086f6fcd153641ec923';
 
 async function fetchAPI(endpoint: string, method: string, body?: any, auth: boolean = true) {
   const headers: any = { 'Content-Type': 'application/json' };
@@ -25,7 +25,7 @@ async function fetchAPI(endpoint: string, method: string, body?: any, auth: bool
       res.on('data', chunk => { data += chunk; });
       res.on('end', () => {
         let parsed;
-        try { parsed = JSON.parse(data); } catch (e) { parsed = data; }
+        try { parsed = JSON.parse(data); } catch (_e) { parsed = data; }
         
         const setCookie = res.headers['set-cookie'];
         if (setCookie) {
@@ -94,7 +94,7 @@ async function runTests() {
     icon: 'dumbbell'
   });
   assert(res.status === 201, 'Habit created successfully', res.body);
-  const habitId = res.body.habit?._id;
+  const _habitId = res.body.habit?._id;
 
   // 5. Create Workout
   console.log('\\n[WORKOUTS] Create Session');

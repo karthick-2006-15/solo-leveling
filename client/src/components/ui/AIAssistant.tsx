@@ -32,6 +32,7 @@ export const AIAssistant: React.FC = () => {
 
   useEffect(() => {
     if (location.pathname === '/assistant') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsOpen(true);
     } else {
       setIsOpen(false);

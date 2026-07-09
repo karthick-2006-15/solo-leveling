@@ -40,7 +40,7 @@ export const VoiceWorkoutLogger: React.FC<VoiceWorkoutLoggerProps> = ({ onVoiceC
     return () => {
       if (recognitionRef.current && isListening) recognitionRef.current.stop();
     };
-  }, [onVoiceCommand]);
+  }, [onVoiceCommand, isListening]);
 
   const toggleListen = () => {
     if (disabled) return;

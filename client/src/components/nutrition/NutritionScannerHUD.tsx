@@ -30,13 +30,10 @@ export const NutritionScannerHUD: React.FC<NutritionScannerHUDProps> = ({
         recognitionRef.current.interimResults = true;
         
         recognitionRef.current.onresult = (event: any) => {
-          let interimTranscript = '';
           for (let i = event.resultIndex; i < event.results.length; i++) {
             const transcript = event.results[i][0].transcript;
             if (event.results[i].isFinal) {
               setInputText(inputText + (inputText ? ' ' : '') + transcript);
-            } else {
-              interimTranscript += transcript;
             }
           }
         };
@@ -59,7 +56,7 @@ export const NutritionScannerHUD: React.FC<NutritionScannerHUDProps> = ({
     return () => {
       if (recognitionRef.current && isListening) recognitionRef.current.stop();
     };
-  }, [inputText, setInputText]);
+  }, [inputText, setInputText, isListening]);
 
   const toggleListen = () => {
     if (isListening) {
@@ -89,6 +86,7 @@ export const NutritionScannerHUD: React.FC<NutritionScannerHUDProps> = ({
   // Scanning sequence animation
   useEffect(() => {
     if (!isScanning) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setScanStep(0);
       return;
     }
@@ -140,7 +138,7 @@ export const NutritionScannerHUD: React.FC<NutritionScannerHUDProps> = ({
           {isListening ? (
              <div className="flex gap-1 items-end h-6">
                {[1,2,3,4,5,6,7].map(i => (
-                 <div key={i} className="w-1.5 bg-cyan-400 animate-[bounce_1s_infinite]" style={{ animationDelay: `${i * 0.1}s`, height: `${Math.random() * 100}%` }} />
+                 <div key={i} className="w-1.5 bg-cyan-400 animate-[bounce_1s_infinite]" style={{ animationDelay: `${i * 0.1}s`, height: `${((i * 37) % 80) + 20}%` }} />
                ))}
              </div>
           ) : (

@@ -12,6 +12,7 @@ import {
   getWater,
   analyzeFood
 } from '../controllers/nutritionController';
+import mongoose from 'mongoose';
 
 const router = Router();
 
@@ -35,7 +36,6 @@ router.get('/summary', getNutritionSummary);
 router.post('/water', logWater);
 router.get('/water', requireAuth, getWater);
 router.get('/clear-cache', async (req, res) => {
-  const mongoose = require('mongoose');
   await mongoose.connection.collection('foodcaches').deleteMany({});
   res.json({ message: 'cleared' });
 });

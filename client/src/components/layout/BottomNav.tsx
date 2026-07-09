@@ -3,7 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useSystemSound } from '../../hooks/useSystemSound';
-import { LayoutDashboard, Target, Activity, User as UserIcon } from 'lucide-react';
+import { haptics } from '../../utils/haptics';
+import { LayoutDashboard, Target, Activity, User as UserIcon, Heart, Crown, Box, Castle as DungeonIcon, BookOpen } from 'lucide-react';
 
 export const BottomNav: React.FC = () => {
   const { user } = useAuthStore();
@@ -14,8 +15,13 @@ export const BottomNav: React.FC = () => {
 
   const tabs = [
     { name: 'Home', path: '/', icon: LayoutDashboard },
+    { name: 'Vitals', path: '/vitals', icon: Heart },
     { name: 'Track', path: '/habits', icon: Activity },
+    { name: 'Monarch', path: '/monarch', icon: Crown },
     { name: 'Quests', path: '/achievements', icon: Target },
+    { name: 'Gates', path: '/dungeons', icon: DungeonIcon },
+    { name: 'Lore', path: '/story', icon: BookOpen },
+    { name: 'Inventory', path: '/inventory', icon: Box },
     { name: 'Profile', path: '/profile', icon: UserIcon },
   ];
 
@@ -43,7 +49,10 @@ export const BottomNav: React.FC = () => {
                 <Link 
                   key={tab.name} 
                   to={tab.path} 
-                  onClick={() => play('click')}
+                  onClick={() => {
+                    play('click');
+                    haptics.lightTap();
+                  }}
                   className={`relative flex flex-col items-center justify-center w-full h-full md:w-auto md:px-4 transition-colors duration-200 z-10 ${
                     isActive ? 'text-[var(--color-system-blue)]' : 'text-[var(--color-system-text-dim)] hover:text-white'
                   }`}

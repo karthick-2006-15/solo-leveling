@@ -12,6 +12,9 @@ import { useSkills } from '../hooks/useSkills';
 import { useMissions } from '../hooks/useMissions';
 import { formatSafeDate } from '../utils/dateUtils';
 import { HunterRankBadge } from '../components/training/HunterRankBadge';
+import { RollingNumber } from '../components/ui/RollingNumber';
+import { ActivityTimeline } from '../components/profile/ActivityTimeline';
+import { ProgressionPrediction } from '../components/profile/ProgressionPrediction';
 
 export const Profile: React.FC = () => {
   const queryClient = useQueryClient();
@@ -25,13 +28,14 @@ export const Profile: React.FC = () => {
 
   const [formData, setFormData] = useState({
     name: '', age: '', gender: '', height: '', weight: '', bodyFatPercent: '',
+    targetWeight: '', targetBodyFat: '', medicalNotes: '',
     fitnessGoal: 'maintain', activityLevel: 'sedentary', experienceLevel: 'beginner',
     dailyCalorieGoal: '', dailyProteinGoal: '', dailyWaterGoalLiters: ''
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
-  const [activeTab, setActiveTab] = useState<'stats' | 'settings'>('stats');
+  const [activeTab, setActiveTab] = useState<'stats' | 'progression' | 'settings'>('stats');
 
   // Fetch Profile
   const profileQuery = useQuery({
@@ -55,6 +59,7 @@ export const Profile: React.FC = () => {
 
   useEffect(() => {
     if (profileQuery.data) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData(prev => ({
         ...prev,
         ...Object.keys(prev).reduce((acc: any, key) => {
@@ -163,6 +168,9 @@ export const Profile: React.FC = () => {
                 <div className="px-3 py-1 border border-cyan-800 bg-cyan-950/40 rounded text-cyan-400 font-mono text-[10px] uppercase tracking-widest">
                   Level {level}
                 </div>
+                <div className="px-3 py-1 border border-cyan-800 bg-cyan-950/40 rounded text-cyan-400 font-mono text-[10px] uppercase tracking-widest">
+                  {progression.activeTitle || 'Beginner Hunter'}
+                </div>
                 <div className="px-3 py-1 border border-purple-800 bg-purple-950/40 rounded text-purple-400 font-mono text-[10px] uppercase tracking-widest">
                   {progression.rank} Rank
                 </div>
@@ -179,7 +187,8 @@ export const Profile: React.FC = () => {
       <div className="flex items-center gap-2 overflow-x-auto pb-2 custom-scrollbar border-b border-cyan-900/50">
         {[
           { id: 'stats', label: 'Hunter Stats', icon: Activity },
-          { id: 'settings', label: 'System Configuration', icon: Target }
+          { id: 'progression', label: 'Progression Log', icon: Target },
+          { id: 'settings', label: 'System Configuration', icon: Hexagon }
         ].map(tab => (
           <button 
             key={tab.id}
@@ -208,7 +217,7 @@ export const Profile: React.FC = () => {
               <p className="font-mono text-[10px] text-gray-500 uppercase tracking-widest mb-6">Real-time stat analysis</p>
               
               <div className="h-80 w-full relative z-10">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="99%" height="100%">
                   <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
                     <PolarGrid stroke="rgba(0, 212, 255, 0.2)" />
                     <PolarAngleAxis dataKey="subject" tick={{ fill: '#00d4ff', fontSize: 10, fontFamily: 'JetBrains Mono' }} />
@@ -226,7 +235,7 @@ export const Profile: React.FC = () => {
 
               <div className="h-80 w-full relative z-10">
                 {chartData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="99%" height="100%">
                     <AreaChart data={chartData}>
                       <defs>
                         <linearGradient id="colorWeight" x1="0" y1="0" x2="0" y2="1">
@@ -245,6 +254,86 @@ export const Profile: React.FC = () => {
                     Insufficient Data
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* TITLES & SKILL POINTS */}
+            <div className="bg-black/60 border border-cyan-900/50 rounded-2xl p-6 backdrop-blur-xl relative overflow-hidden lg:col-span-2">
+              <div className="flex flex-col md:flex-row gap-8">
+                {/* SKILL POINTS */}
+                <div className="md:w-1/3">
+                  <h2 className="font-display uppercase tracking-[0.2em] text-cyan-500 mb-2">Skill Points</h2>
+                  <p className="font-mono text-[10px] text-gray-500 uppercase tracking-widest mb-4">Unallocated</p>
+                  <div className="bg-cyan-950/20 border border-cyan-900/30 rounded-xl p-6 text-center">
+                    <div className="font-display text-5xl text-yellow-400 text-shadow-glow">
+                      <RollingNumber value={progression.skillPoints || 0} />
+                    </div>
+                    <div className="font-mono text-[9px] text-gray-400 uppercase tracking-widest mt-2">Available Points</div>
+                  </div>
+                </div>
+
+                {/* TITLES */}
+                <div className="md:w-2/3">
+                  <h2 className="font-display uppercase tracking-[0.2em] text-cyan-500 mb-2">Hunter Titles</h2>
+                  <p className="font-mono text-[10px] text-gray-500 uppercase tracking-widest mb-4">Unlocked Achievements</p>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-60 overflow-y-auto custom-scrollbar pr-2">
+                    {progression.unlockedTitles?.map(title => (
+                      <div key={title} className={`p-3 rounded border flex flex-col gap-1 transition-colors ${
+                        title === progression.activeTitle ? 'bg-cyan-950/40 border-cyan-400 shadow-[0_0_10px_rgba(0,212,255,0.2)]' : 'bg-black/40 border-cyan-900/30'
+                      }`}>
+                        <div className="flex justify-between items-start">
+                          <span className="font-mono text-xs text-cyan-50 uppercase tracking-widest">{title.replace(/_/g, ' ')}</span>
+                          {title === progression.activeTitle && <Target className="w-3 h-3 text-cyan-400" />}
+                        </div>
+                        {title === progression.activeTitle ? (
+                          <span className="font-mono text-[9px] text-cyan-400 uppercase tracking-widest">Equipped</span>
+                        ) : (
+                          <button 
+                            className="font-mono text-[9px] text-gray-500 hover:text-cyan-400 uppercase tracking-widest text-left"
+                            onClick={async () => {
+                              try {
+                                await fetchWithAuth('/api/progression/title/equip', {
+                                  method: 'POST',
+                                  body: JSON.stringify({ titleId: title })
+                                });
+                                queryClient.invalidateQueries({ queryKey: ['progression'] });
+                              } catch (e) {
+                                console.error('Failed to equip title', e);
+                              }
+                            }}
+                          >
+                            Equip Title
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    {!progression.unlockedTitles?.length && (
+                      <div className="col-span-full p-4 border border-dashed border-cyan-900/30 rounded text-center">
+                        <span className="font-mono text-[10px] text-gray-600 uppercase tracking-widest">No Titles Found</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {activeTab === 'progression' && (
+          <motion.div 
+            key="progression"
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
+            className="space-y-6"
+          >
+            <ProgressionPrediction />
+            
+            <div className="bg-black/60 border border-cyan-900/50 rounded-2xl p-6 backdrop-blur-xl relative overflow-hidden">
+              <h2 className="font-display uppercase tracking-[0.2em] text-cyan-500 mb-6 flex items-center gap-2">
+                <Target className="w-5 h-5" /> Operational History
+              </h2>
+              <div className="max-h-[600px] overflow-y-auto custom-scrollbar pr-4">
+                <ActivityTimeline />
               </div>
             </div>
           </motion.div>
@@ -302,6 +391,21 @@ export const Profile: React.FC = () => {
                         <label className="block text-[9px] font-mono text-cyan-400 uppercase tracking-widest mb-1">FAT (%)</label>
                         <input type="number" name="bodyFatPercent" value={formData.bodyFatPercent} onChange={handleChange} className="w-full bg-black/50 border border-cyan-900/50 rounded px-4 py-3 text-white font-mono text-sm focus:border-cyan-400 focus:outline-none transition-colors" />
                       </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[9px] font-mono text-cyan-400 uppercase tracking-widest mb-1">Target WGT (kg)</label>
+                        <input type="number" name="targetWeight" value={formData.targetWeight} onChange={handleChange} className="w-full bg-black/50 border border-cyan-900/50 rounded px-4 py-3 text-white font-mono text-sm focus:border-cyan-400 focus:outline-none transition-colors" />
+                      </div>
+                      <div>
+                        <label className="block text-[9px] font-mono text-cyan-400 uppercase tracking-widest mb-1">Target FAT (%)</label>
+                        <input type="number" name="targetBodyFat" value={formData.targetBodyFat} onChange={handleChange} className="w-full bg-black/50 border border-cyan-900/50 rounded px-4 py-3 text-white font-mono text-sm focus:border-cyan-400 focus:outline-none transition-colors" />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[9px] font-mono text-cyan-400 uppercase tracking-widest mb-1">Medical Notes / Conditions (Optional)</label>
+                      <input type="text" name="medicalNotes" value={formData.medicalNotes} onChange={handleChange} placeholder="e.g. Asthma, Knee Injury" className="w-full bg-black/50 border border-cyan-900/50 rounded px-4 py-3 text-white font-mono text-sm focus:border-cyan-400 focus:outline-none transition-colors" />
                     </div>
                   </div>
                 </div>

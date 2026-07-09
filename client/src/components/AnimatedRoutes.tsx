@@ -17,7 +17,19 @@ const NotificationsSettings = React.lazy(() => import('../pages/NotificationsSet
 const MealPlanner = React.lazy(() => import('../pages/MealPlanner').then(module => ({ default: module.MealPlanner })));
 const WeeklyReview = React.lazy(() => import('../pages/WeeklyReview').then(module => ({ default: module.WeeklyReview })));
 const NotFound = React.lazy(() => import('../pages/NotFound').then(module => ({ default: module.NotFound })));
-const Assistant = React.lazy(() => import('../pages/Assistant').then(module => ({ default: module.Assistant })));
+const AriaCommandCenter = React.lazy(() => import('../pages/AriaCommandCenter').then(module => ({ default: module.AriaCommandCenter })));
+const Vitals = React.lazy(() => import('../pages/Vitals').then(module => ({ default: module.Vitals })));
+const InnerMonarch = React.lazy(() => import('../pages/InnerMonarch').then(module => ({ default: module.InnerMonarch })));
+const Economy = React.lazy(() => import('../pages/Economy').then(module => ({ default: module.Economy })));
+const Shop = React.lazy(() => import('../pages/Shop').then(module => ({ default: module.Shop })));
+const HunterMuseum = React.lazy(() => import('../pages/HunterMuseum').then(module => ({ default: module.HunterMuseum })));
+const Inventory = React.lazy(() => import('../pages/Inventory').then(module => ({ default: module.Inventory })));
+const Dungeons = React.lazy(() => import('../pages/Dungeons').then(module => ({ default: module.Dungeons })));
+const Story = React.lazy(() => import('../pages/Story').then(module => ({ default: module.Story })));
+const CareerDashboard = React.lazy(() => import('../pages/CareerDashboard'));
+const AcademicDashboard = React.lazy(() => import('../pages/AcademicDashboard'));
+const FinanceDashboard = React.lazy(() => import('../pages/FinanceDashboard'));
+const AriaPlanner = React.lazy(() => import('../pages/AriaPlanner'));
 import { ProtectedRoute } from './ProtectedRoute';
 
 const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -48,10 +60,22 @@ export const AnimatedRoutes: React.FC = () => {
         <Route path="/dsa" element={<ProtectedRoute><PageWrapper><DSA /></PageWrapper></ProtectedRoute>} />
         <Route path="/achievements" element={<ProtectedRoute><PageWrapper><Achievements /></PageWrapper></ProtectedRoute>} />
         <Route path="/analytics" element={<ProtectedRoute><PageWrapper><AnalyticsDashboard /></PageWrapper></ProtectedRoute>} />
-        <Route path="/assistant" element={<ProtectedRoute><PageWrapper><Assistant /></PageWrapper></ProtectedRoute>} />
+        <Route path="/assistant" element={<ProtectedRoute><PageWrapper><AriaCommandCenter /></PageWrapper></ProtectedRoute>} />
+        <Route path="/vitals" element={<ProtectedRoute><PageWrapper><Vitals /></PageWrapper></ProtectedRoute>} />
+        <Route path="/monarch" element={<ProtectedRoute><PageWrapper><InnerMonarch /></PageWrapper></ProtectedRoute>} />
+        <Route path="/economy" element={<ProtectedRoute><PageWrapper><Economy /></PageWrapper></ProtectedRoute>} />
+        <Route path="/shop" element={<ProtectedRoute><PageWrapper><Shop /></PageWrapper></ProtectedRoute>} />
+        <Route path="/museum" element={<ProtectedRoute><PageWrapper><HunterMuseum /></PageWrapper></ProtectedRoute>} />
+        <Route path="/dungeons" element={<ProtectedRoute><PageWrapper><Dungeons /></PageWrapper></ProtectedRoute>} />
+        <Route path="/story" element={<ProtectedRoute><PageWrapper><Story /></PageWrapper></ProtectedRoute>} />
+        <Route path="/inventory" element={<ProtectedRoute><PageWrapper><Inventory /></PageWrapper></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><PageWrapper><NotificationsSettings /></PageWrapper></ProtectedRoute>} />
         <Route path="/meal-planner" element={<ProtectedRoute><PageWrapper><MealPlanner /></PageWrapper></ProtectedRoute>} />
         <Route path="/weekly-review" element={<ProtectedRoute><PageWrapper><WeeklyReview /></PageWrapper></ProtectedRoute>} />
+        <Route path="/career" element={<ProtectedRoute><PageWrapper><CareerDashboard /></PageWrapper></ProtectedRoute>} />
+        <Route path="/academics" element={<ProtectedRoute><PageWrapper><AcademicDashboard /></PageWrapper></ProtectedRoute>} />
+        <Route path="/finance" element={<ProtectedRoute><PageWrapper><FinanceDashboard /></PageWrapper></ProtectedRoute>} />
+        <Route path="/aria-planner" element={<ProtectedRoute><PageWrapper><AriaPlanner /></PageWrapper></ProtectedRoute>} />
         <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
       </Routes>
     </AnimatePresence>

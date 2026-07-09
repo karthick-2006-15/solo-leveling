@@ -3,6 +3,9 @@ import { getNotificationSettings, updateNotificationSettings, subscribeToPush, u
 import { GlassCard } from '../components/ui/GlassCard';
 import { Bell, Mail, Clock, Droplets, Utensils, BookOpen, Code, Moon } from 'lucide-react';
 import { AchievementToast } from '../components/ui/AchievementToast';
+import { useAudioStore } from '../store/useAudioStore';
+import { useSettings } from '../contexts/SettingsContext';
+import { Volume2, VolumeX, Eye, Minimize2, AudioLines, Sliders } from 'lucide-react';
 
 // Utility to convert VAPID key
 function urlBase64ToUint8Array(base64String: string) {
@@ -26,6 +29,9 @@ export const NotificationsSettings = () => {
   const [settings, setSettings] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [toasts, setToasts] = useState<any[]>([]);
+  
+  const { masterVolume, setMasterVolume, musicVolume, setMusicVolume, effectsVolume, setEffectsVolume, soundEnabled, toggleSound } = useAudioStore();
+  const { reducedMotion, setReducedMotion, highContrast, setHighContrast } = useSettings();
 
   const loadSettings = async () => {
     try {
@@ -129,11 +135,74 @@ export const NotificationsSettings = () => {
 
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-neonBlue to-white">
-          Notification Settings
+          System Configuration
         </h1>
       </div>
 
-      <p className="text-textMuted">Configure how ARIA alerts you to your daily quests and habits. Your browser will ask permission. You can revoke any time.</p>
+      <p className="text-textMuted">Configure Audio, Accessibility, and Push Notifications.</p>
+      
+      {/* AUDIO ENGINE SETTINGS */}
+      <h2 className="text-2xl font-bold mt-10 mb-4 flex items-center gap-2"><AudioLines className="text-neonBlue"/> Audio Engine</h2>
+      <GlassCard className="border-white/10 space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h3 className="font-bold text-lg flex items-center gap-2">Master Audio {soundEnabled ? <Volume2 size={18} className="text-neonBlue" /> : <VolumeX size={18} className="text-red-500" />}</h3>
+            <p className="text-sm text-textMuted">Toggle all sound effects and background music.</p>
+          </div>
+          <button 
+            onClick={toggleSound}
+            className={`px-4 py-2 rounded font-bold transition-all ${soundEnabled ? 'bg-neonBlue/20 text-neonBlue border border-neonBlue' : 'bg-white/10 text-textMuted'}`}
+          >
+            {soundEnabled ? 'ENABLED' : 'MUTED'}
+          </button>
+        </div>
+        
+        <div className={`space-y-4 ${!soundEnabled ? 'opacity-50 pointer-events-none' : ''}`}>
+          <div>
+            <div className="flex justify-between text-sm mb-1">
+              <span>Master Volume</span>
+              <span className="text-neonBlue">{Math.round(masterVolume * 100)}%</span>
+            </div>
+            <input type="range" min="0" max="1" step="0.05" value={masterVolume} onChange={(e) => setMasterVolume(Number(e.target.value))} className="w-full accent-neonBlue" />
+          </div>
+          <div>
+            <div className="flex justify-between text-sm mb-1">
+              <span>Background Music</span>
+              <span className="text-purple-400">{Math.round(musicVolume * 100)}%</span>
+            </div>
+            <input type="range" min="0" max="1" step="0.05" value={musicVolume} onChange={(e) => setMusicVolume(Number(e.target.value))} className="w-full accent-purple-500" />
+          </div>
+          <div>
+            <div className="flex justify-between text-sm mb-1">
+              <span>Sound Effects</span>
+              <span className="text-green-400">{Math.round(effectsVolume * 100)}%</span>
+            </div>
+            <input type="range" min="0" max="1" step="0.05" value={effectsVolume} onChange={(e) => setEffectsVolume(Number(e.target.value))} className="w-full accent-green-500" />
+          </div>
+        </div>
+      </GlassCard>
+
+      {/* ACCESSIBILITY SETTINGS */}
+      <h2 className="text-2xl font-bold mt-10 mb-4 flex items-center gap-2"><Eye className="text-neonBlue"/> Accessibility & Display</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <GlassCard>
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="font-bold flex items-center gap-2"><Minimize2 size={18} className="text-blue-400"/> Reduce Motion</h3>
+            <input type="checkbox" checked={reducedMotion} onChange={(e) => setReducedMotion(e.target.checked)} className="w-5 h-5 accent-neonBlue" />
+          </div>
+          <p className="text-xs text-textMuted">Disables particle effects, heavy animations, and 3D transitions.</p>
+        </GlassCard>
+        
+        <GlassCard>
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="font-bold flex items-center gap-2"><Sliders size={18} className="text-yellow-400"/> High Contrast</h3>
+            <input type="checkbox" checked={highContrast} onChange={(e) => setHighContrast(e.target.checked)} className="w-5 h-5 accent-neonBlue" />
+          </div>
+          <p className="text-xs text-textMuted">Increases text readability and borders.</p>
+        </GlassCard>
+      </div>
+
+      <h2 className="text-2xl font-bold mt-10 mb-4 flex items-center gap-2"><Bell className="text-neonBlue"/> Push Notifications</h2>
 
       {/* MASTER PUSH TOGGLE */}
       <GlassCard className="flex flex-col sm:flex-row justify-between items-center border-neonBlue shadow-[0_0_15px_rgba(0,212,255,0.1)]">

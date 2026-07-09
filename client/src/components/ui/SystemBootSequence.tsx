@@ -1,14 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSystemSound } from '../../hooks/useSystemSound';
+import { haptics } from '../../utils/haptics';
 
 export const SystemBootSequence: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
   const [stage, setStage] = useState(0);
 
+  const { play } = useSystemSound();
+
   useEffect(() => {
     // Stage 0: Initial black screen, power on
-    const t1 = setTimeout(() => setStage(1), 800);
+    const t1 = setTimeout(() => {
+      setStage(1);
+      play('boot');
+      haptics.heavyTap();
+    }, 800);
+    
     // Stage 1: Scanning / Boot text
-    const t2 = setTimeout(() => setStage(2), 2500);
+    const t2 = setTimeout(() => {
+      setStage(2);
+      play('online');
+      haptics.success();
+    }, 2500);
+    
     // Stage 2: Final flash
     const t3 = setTimeout(() => {
       setStage(3);
@@ -16,7 +30,7 @@ export const SystemBootSequence: React.FC<{ onComplete: () => void }> = ({ onCom
     }, 3500);
 
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
-  }, [onComplete]);
+  }, [onComplete, play]);
 
   return (
     <AnimatePresence>

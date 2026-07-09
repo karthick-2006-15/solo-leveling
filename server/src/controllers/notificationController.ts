@@ -13,7 +13,7 @@ export const getSettings = async (req: AuthRequest, res: Response) => {
     }
     
     res.json(settings);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Failed to fetch settings' });
   }
 };
@@ -34,7 +34,7 @@ export const updateSettings = async (req: AuthRequest, res: Response) => {
     );
     
     res.json(settings);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Failed to update settings' });
   }
 };
@@ -60,7 +60,7 @@ export const subscribePush = async (req: AuthRequest, res: Response) => {
     );
 
     res.json(settings);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Failed to subscribe to push notifications' });
   }
 };
@@ -81,7 +81,7 @@ export const unsubscribePush = async (req: AuthRequest, res: Response) => {
     );
 
     res.json(settings);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Failed to unsubscribe from push notifications' });
   }
 };
@@ -97,7 +97,7 @@ export const testPush = async (req: AuthRequest, res: Response) => {
     });
     
     res.json({ message: 'Test notification queued' });
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Failed to send test push' });
   }
 };
