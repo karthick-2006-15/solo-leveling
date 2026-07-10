@@ -16,37 +16,36 @@ class EconomyService {
     const today = new Date(now);
     today.setUTCHours(0, 0, 0, 0);
 
-    const lastLogin = profile.lastLoginDate;
-    
-    if (lastLogin) {
-      const last = new Date(lastLogin);
-      last.setUTCHours(0,0,0,0);
-      
+    // Use the generic lastActiveDate for login streak purposes
+    if (profile.lastActiveDate) {
+      const last = new Date(profile.lastActiveDate);
+      last.setUTCHours(0, 0, 0, 0);
+
       const diffTime = Math.abs(today.getTime() - last.getTime());
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-      
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
       if (diffDays === 0) {
         throw new Error('Daily login already claimed today');
       } else if (diffDays === 1) {
-        profile.currentLoginStreak += 1;
+        profile.currentStreak += 1;
       } else {
         // Broken streak
         profile.missedDays += (diffDays - 1);
-        profile.currentLoginStreak = 1;
+        profile.currentStreak = 1;
       }
     } else {
-      profile.currentLoginStreak = 1;
+      profile.currentStreak = 1;
     }
 
-    if (profile.currentLoginStreak > profile.longestLoginStreak) {
-      profile.longestLoginStreak = profile.currentLoginStreak;
+    if (profile.currentStreak > profile.longestStreak) {
+      profile.longestStreak = profile.currentStreak;
     }
 
-    profile.lastLoginDate = now;
+    profile.lastActiveDate = now;
     await profile.save(); // Save streak first
 
     // Reward Calendar Logic
-    const dayInCycle = ((profile.currentLoginStreak - 1) % 30) + 1;
+    const dayInCycle = ((profile.currentStreak - 1) % 30) + 1;
     let rewardCoins = 0;
     let rewardXP = 0;
     let rewardSP = 0;
@@ -69,18 +68,18 @@ class EconomyService {
     } else {
       // Normal Days
       if (dayInCycle % 3 === 0) {
-        rewardCoins = 50 + (profile.currentLoginStreak * 5); // Scaling coins
+        rewardCoins = 50 + (profile.currentStreak * 5); // Scaling coins
       } else if (dayInCycle % 2 === 0) {
-        rewardXP = 100 + (profile.currentLoginStreak * 10);
+        rewardXP = 100 + (profile.currentStreak * 10);
       } else {
-        rewardCoins = 20 + (profile.currentLoginStreak * 2);
+        rewardCoins = 20 + (profile.currentStreak * 2);
       }
     }
 
     const result = await rewardEngine.dispatchReward({
       userId,
       source: 'daily_login',
-      reason: `Daily Login Streak: Day ${profile.currentLoginStreak}`,
+      reason: `Daily Login Streak: Day ${profile.currentStreak}`,
       coins: rewardCoins,
       xp: rewardXP,
       skillPoints: rewardSP,
@@ -89,7 +88,7 @@ class EconomyService {
 
     return {
       success: true,
-      streak: profile.currentLoginStreak,
+      streak: profile.currentStreak,
       rewardResult: result,
       specialMessage
     };

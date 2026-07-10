@@ -6,7 +6,7 @@ import WaterLog from '../models/WaterLog';
 import WorkoutSession from '../models/WorkoutSession';
 import WellnessLog from '../models/WellnessLog';
 import RecoveryLog from '../models/RecoveryLog';
-import { _AppError } from '../utils/AppError';
+import { AppError } from '../utils/AppError';
 
 class RecoveryService {
   /**

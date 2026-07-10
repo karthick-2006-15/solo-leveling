@@ -5,7 +5,7 @@ import WellnessLog from '../models/WellnessLog';
 import WeightLog from '../models/WeightLog';
 import RecoveryLog from '../models/RecoveryLog';
 import { recoveryService } from './recoveryService';
-import { _AppError } from '../utils/AppError';
+import { AppError } from '../utils/AppError';
 
 class HealthService {
   async logSleep(userId: string, data: any) {

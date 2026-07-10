@@ -1,5 +1,5 @@
 import Campaign from '../models/Campaign';
-import { _dungeonService } from './dungeonService';
+import { dungeonService } from './dungeonService';
 
 class CampaignService {
   async getActiveCampaigns(userId: string) {

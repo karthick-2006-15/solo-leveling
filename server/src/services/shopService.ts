@@ -1,7 +1,7 @@
 import ShopItem from '../models/ShopItem';
 import ProgressionProfile from '../models/ProgressionProfile';
 import { inventoryService } from './inventoryService';
-import { _rewardEngine } from './rewardEngine';
+import { rewardEngine } from './rewardEngine';
 import InventoryItem from '../models/InventoryItem';
 
 class ShopService {

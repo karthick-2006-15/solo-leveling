@@ -54,8 +54,8 @@ export const getEconomyStats = async (req: AuthRequest, res: Response, next: Nex
         lifetimeCoinsSpent: profile.lifetimeCoinsSpent,
         weeklyCoins: profile.weeklyCoins,
         monthlyCoins: profile.monthlyCoins,
-        currentLoginStreak: profile.currentLoginStreak,
-        longestLoginStreak: profile.longestLoginStreak,
+        currentLoginStreak: profile.currentStreak,
+        longestLoginStreak: profile.longestStreak,
         missedDays: profile.missedDays
       } 
     });

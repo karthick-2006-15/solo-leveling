@@ -16,6 +16,17 @@ export interface IUser extends Document {
   dailyWaterGoalLiters?: number;
   activityLevel?: 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active';
   experienceLevel?: 'beginner' | 'intermediate' | 'advanced';
+  healthMetrics?: {
+    sleepQuality: number;
+    energyLevel: number;
+    stressLevel: number;
+    screenTimeHours: number;
+    lastCheckIn: Date;
+  };
+  specialDays?: Array<{
+    date: Date;
+    type: string;
+  }>;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -50,7 +61,20 @@ const UserSchema: Schema = new Schema({
   experienceLevel: { 
     type: String, 
     enum: ['beginner', 'intermediate', 'advanced'] 
-  }
+  },
+  
+  healthMetrics: {
+    sleepQuality: { type: Number },
+    energyLevel: { type: Number },
+    stressLevel: { type: Number },
+    screenTimeHours: { type: Number },
+    lastCheckIn: { type: Date }
+  },
+  
+  specialDays: [{
+    date: { type: Date },
+    type: { type: String }
+  }]
 }, { timestamps: true });
 
 export default mongoose.model<IUser>('User', UserSchema);

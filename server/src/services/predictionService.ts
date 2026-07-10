@@ -1,6 +1,6 @@
 import { xpLogRepository } from '../repositories/xpLogRepository';
 import { getProgressionProfile } from './progressionService';
-import { xpRequiredForLevel, _getRankForProfile, RANK_TABLE } from '../config/progressionConfig';
+import { getRankForLevel, RANK_TABLE, xpRequiredForLevel } from '../config/progressionConfig';
 
 export const getProgressionPrediction = async (userId: string) => {
   const profile = await getProgressionProfile(userId);
@@ -31,7 +31,7 @@ export const getProgressionPrediction = async (userId: string) => {
     
     if (levelsNeeded === 0) {
       // Just waiting on streak
-      const streakNeeded = Math.max(0, nextRank.minStreak - profile.currentStreak);
+      const streakNeeded = Math.max(0, (nextRank.minStreak || 0) - profile.currentStreak);
       daysToNextRank = streakNeeded;
     } else {
       // Very rough estimation: (current level req * levels needed) / daily average

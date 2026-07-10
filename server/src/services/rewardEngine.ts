@@ -1,7 +1,7 @@
 import _mongoose from 'mongoose';
 import ProgressionProfile from '../models/ProgressionProfile';
 import RewardHistoryLog from '../models/RewardHistoryLog';
-import { awardXP, _checkAchievements, _checkTitles } from './progressionService';
+import { awardXP, checkAchievements } from './progressionService';
 import logger from '../utils/logger';
 import { clearCachePattern } from '../config/redis';
 
@@ -24,7 +24,7 @@ class RewardEngine {
     
     if (xp !== 0) {
       // Reusing progressionService to handle leveling, combo, streaks, milestones, XP logging
-      xpResult = await awardXP(userId, source, xp, 'system', reason);
+      xpResult = await awardXP(userId, source, xp);
     }
 
     // Now handle Coins and Skill Points natively here, as well as the unified RewardHistoryLog

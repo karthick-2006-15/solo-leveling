@@ -1,4 +1,4 @@
-import { _Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { AuthRequest } from '../middleware/authMiddleware';
 import { getCareerProfile, updateCareerProfile } from '../services/careerService';
 

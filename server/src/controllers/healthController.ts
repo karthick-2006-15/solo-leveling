@@ -1,7 +1,7 @@
 import { Response, NextFunction } from 'express';
 import { AuthRequest } from '../middleware/authMiddleware';
 import { healthService } from '../services/healthService';
-import { _AppError } from '../utils/AppError';
+import { AppError } from '../utils/AppError';
 
 export const logSleep = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {

@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import ProgressionProfile from '../models/ProgressionProfile';
 import InventoryItem from '../models/InventoryItem';
 
@@ -13,7 +14,9 @@ class RelicService {
       profile.equippedRelics = [];
     }
 
-    if (profile.equippedRelics.includes(itemDocId)) {
+    const objectId = new mongoose.Types.ObjectId(itemDocId);
+
+    if (profile.equippedRelics.some(id => id.toString() === objectId.toString())) {
       throw new Error("Relic already equipped.");
     }
 
@@ -22,7 +25,7 @@ class RelicService {
       throw new Error("Maximum relic slots equipped. Unequip a relic first.");
     }
 
-    profile.equippedRelics.push(itemDocId);
+    profile.equippedRelics.push(objectId);
     item.status = 'equipped';
     await item.save();
     await profile.save();
@@ -34,7 +37,8 @@ class RelicService {
     const profile = await ProgressionProfile.findOne({ userId });
     if (!profile) throw new Error("Profile not found.");
 
-    profile.equippedRelics = profile.equippedRelics.filter(id => id.toString() !== itemDocId.toString());
+    const objectId = new mongoose.Types.ObjectId(itemDocId);
+    profile.equippedRelics = profile.equippedRelics.filter((id: mongoose.Types.ObjectId) => id.toString() !== objectId.toString());
     
     await InventoryItem.updateOne({ _id: itemDocId, userId }, { status: 'active' });
     await profile.save();

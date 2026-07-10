@@ -8,7 +8,13 @@ export const xpRequiredForLevel = (level: number): number => {
   return Math.round(100 * Math.pow(level, 1.6));
 };
 
-export const RANK_TABLE = [
+export interface RankConfig {
+  name: string;
+  minLevel: number;
+  minStreak?: number;
+}
+
+export const RANK_TABLE: RankConfig[] = [
   { name: 'Shadow Monarch', minLevel: 111 },
   { name: 'Monarch', minLevel: 91 },
   { name: 'National Hunter', minLevel: 71 },

@@ -14,6 +14,18 @@ export interface IProgressionProfile extends Document {
     achievementId: string;
     unlockedAt: Date;
   }>;
+  prestigeLevel: number;
+  prestigePoints: number;
+  hunterScore: number;
+  lifetimeCoinsEarned: number;
+  lifetimeCoinsSpent: number;
+  weeklyCoins: number;
+  monthlyCoins: number;
+  skillPoints: number;
+  equippedRelics: mongoose.Types.ObjectId[];
+  missedDays: number;
+  luckBase: number;
+  pityCounter: number;
 }
 
 const ProgressionProfileSchema: Schema = new Schema({
@@ -29,7 +41,19 @@ const ProgressionProfileSchema: Schema = new Schema({
   unlockedAchievements: [{
     achievementId: { type: String },
     unlockedAt: { type: Date, default: Date.now }
-  }]
+  }],
+  prestigeLevel: { type: Number, default: 0 },
+  prestigePoints: { type: Number, default: 0 },
+  hunterScore: { type: Number, default: 0 },
+  lifetimeCoinsEarned: { type: Number, default: 0 },
+  lifetimeCoinsSpent: { type: Number, default: 0 },
+  weeklyCoins: { type: Number, default: 0 },
+  monthlyCoins: { type: Number, default: 0 },
+  skillPoints: { type: Number, default: 0 },
+  equippedRelics: [{ type: Schema.Types.ObjectId, ref: 'InventoryItem' }],
+  missedDays: { type: Number, default: 0 },
+  luckBase: { type: Number, default: 10 },
+  pityCounter: { type: Number, default: 0 }
 }, { timestamps: true });
 
 export default mongoose.model<IProgressionProfile>('ProgressionProfile', ProgressionProfileSchema);

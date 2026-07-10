@@ -46,7 +46,7 @@ export const generateDailyMissions = async (userId: string, date: Date = new Dat
   const shadowWinning = battleResult.shadowWinning;
 
   // 3. Evaluate Special Days (Exam, Holiday, etc.)
-  const specialDay = user.specialDays?.find(d => {
+  const specialDay = user.specialDays?.find((d: any) => {
     const dStart = new Date(d.date);
     dStart.setUTCHours(0,0,0,0);
     return dStart.getTime() === startOfDay.getTime();
@@ -127,7 +127,7 @@ export const generateDailyMissions = async (userId: string, date: Date = new Dat
     const t = templates.find(temp => temp._id.toString() === instance.templateId);
     if (t && t.prerequisites && t.prerequisites.length > 0) {
       const depIds: mongoose.Types.ObjectId[] = [];
-      for (const preReqId of t.prerequisites) {
+      for (const preReqId of t.prerequisites.map((dep: mongoose.Types.ObjectId) => dep.toString())) {
         const mappedInstId = templateToInstanceMap.get(preReqId.toString());
         if (mappedInstId) {
           depIds.push(mappedInstId);
@@ -169,10 +169,10 @@ export const completeMission = async (instanceId: string, userId: string) => {
   const unlockedIds: string[] = [];
 
   for (const locked of lockedQuests) {
-    if (locked.dependencies.some(dep => dep.toString() === instance._id.toString())) {
+    if (locked.dependencies?.some(dep => dep.toString() === instance._id.toString())) {
       // Check if ALL dependencies are completed
       let allMet = true;
-      for (const depId of locked.dependencies) {
+      for (const depId of (locked.dependencies || [])) {
         const depQuest = await QuestInstance.findById(depId);
         if (!depQuest || depQuest.status !== 'completed') {
           allMet = false;
