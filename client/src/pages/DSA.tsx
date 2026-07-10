@@ -193,9 +193,9 @@ export const DSA: React.FC = () => {
                   <ResponsiveContainer width="99%" height="100%">
                     <PieChart>
                       <Pie data={[
-                        { name: 'E-Rank (Easy)', value: stats.difficultyCounts.easy || 0 },
-                        { name: 'C-Rank (Med)', value: stats.difficultyCounts.medium || 0 },
-                        { name: 'A-Rank (Hard)', value: stats.difficultyCounts.hard || 0 }
+                        { name: 'E-Rank (Easy)', value: stats?.difficultyCounts?.easy || 0 },
+                        { name: 'C-Rank (Med)', value: stats?.difficultyCounts?.medium || 0 },
+                        { name: 'A-Rank (Hard)', value: stats?.difficultyCounts?.hard || 0 }
                       ]} innerRadius={40} outerRadius={70} paddingAngle={5} dataKey="value">
                         <Cell fill={pieColors.easy} />
                         <Cell fill={pieColors.medium} />
@@ -209,9 +209,9 @@ export const DSA: React.FC = () => {
                 )}
               </div>
               <div className="flex justify-center gap-4 mt-2">
-                <div className="text-[9px] font-mono text-green-400 uppercase">Easy: {stats?.difficultyCounts.easy || 0}</div>
-                <div className="text-[9px] font-mono text-yellow-400 uppercase">Med: {stats?.difficultyCounts.medium || 0}</div>
-                <div className="text-[9px] font-mono text-red-400 uppercase">Hard: {stats?.difficultyCounts.hard || 0}</div>
+                <div className="text-[9px] font-mono text-green-400 uppercase">Easy: {stats?.difficultyCounts?.easy || 0}</div>
+                <div className="text-[9px] font-mono text-yellow-400 uppercase">Med: {stats?.difficultyCounts?.medium || 0}</div>
+                <div className="text-[9px] font-mono text-red-400 uppercase">Hard: {stats?.difficultyCounts?.hard || 0}</div>
               </div>
             </div>
 

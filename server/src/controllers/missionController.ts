@@ -29,5 +29,13 @@ export const missionController = {
     
     const badges = await missionService.getBadges(req.user.id);
     res.json({ badges });
+  }),
+
+  checkIn: asyncHandler(async (req: AuthRequest, res: Response) => {
+    if (!req.user) throw new AppError('Not authenticated', 401);
+    
+    // In a real implementation, we would save the vitals to calibrate missions.
+    // For now, just return success.
+    res.json({ success: true, message: 'Check-in successful' });
   })
 };

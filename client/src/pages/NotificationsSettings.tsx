@@ -35,7 +35,20 @@ export const NotificationsSettings = () => {
 
   const loadSettings = async () => {
     try {
-      const data = await getNotificationSettings();
+      const res = await getNotificationSettings();
+      const data = await res.json();
+      
+      // Ensure push object exists to prevent undefined errors
+      if (!data.push) {
+        data.push = {
+          enabled: false,
+          workoutReminder: { enabled: false, time: '20:00' },
+          waterReminder: { enabled: false, intervalHours: 2 },
+          mealReminder: { enabled: false, times: ['08:00', '13:00', '19:00'] },
+          sleepReminder: { enabled: false, time: '22:00' }
+        };
+      }
+      
       setSettings(data);
     } catch (err) {
       console.error(err);

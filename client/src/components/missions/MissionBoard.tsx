@@ -30,7 +30,7 @@ export const MissionBoard: React.FC = () => {
   const { data: quests = [], isLoading } = useQuery<Quest[]>({
     queryKey: ['adaptiveQuests'],
     queryFn: async () => {
-      const res = await fetchWithAuth('/api/missions/daily');
+      const res = await fetchWithAuth('/api/missions/quests/today');
       const data = await res.json();
       return data.quests || [];
     },

@@ -87,6 +87,18 @@ async function bootstrap() {
     const achievementRoutes = (await import('./routes/achievementRoutes')).default;
     const notificationRoutes = (await import('./routes/notificationRoutes')).default;
     
+    // Additional Subsystem Routes
+    const academicRoutes = (await import('./routes/academicRoutes')).default;
+    const ariaRoutes = (await import('./routes/ariaRoutes')).default;
+    const careerRoutes = (await import('./routes/careerRoutes')).default;
+    const dungeonRoutes = (await import('./routes/dungeonRoutes')).default;
+    const economyRoutes = (await import('./routes/economyRoutes')).default;
+    const financeRoutes = (await import('./routes/financeRoutes')).default;
+    const healthRoutes = (await import('./routes/healthRoutes')).default;
+    const inventoryRoutes = (await import('./routes/inventoryRoutes')).default;
+    const monarchRoutes = (await import('./routes/monarchRoutes')).default;
+    const rewardRoutes = (await import('./routes/rewardRoutes')).default;
+    
     // Error Handler
     const { globalErrorHandler } = await import('./middleware/errorHandler');
     // Cron Jobs
@@ -136,6 +148,18 @@ async function bootstrap() {
     app.use('/api/achievements', achievementRoutes);
     app.use('/api/assistant', aiRoutes);
     app.use('/api/notifications', notificationRoutes);
+    
+    // Additional Subsystem Mounting
+    app.use('/api/academics', academicRoutes);
+    app.use('/api/aria', ariaRoutes);
+    app.use('/api/career', careerRoutes);
+    app.use('/api/dungeons', dungeonRoutes);
+    app.use('/api/economy', economyRoutes);
+    app.use('/api/finance', financeRoutes);
+    app.use('/api/health', healthRoutes);
+    app.use('/api/inventory', inventoryRoutes);
+    app.use('/api/monarch', monarchRoutes);
+    app.use('/api/rewards', rewardRoutes);
 
     // Serve Frontend in Production
     if (process.env.NODE_ENV === 'production') {

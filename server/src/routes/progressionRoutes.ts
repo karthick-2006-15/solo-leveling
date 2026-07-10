@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getMe, awardDevXP } from '../controllers/progressionController';
+import { getMe, awardDevXP, getPrediction, getHistory } from '../controllers/progressionController';
 import { requireAuth } from '../middleware/authMiddleware';
 
 const router = Router();
@@ -10,5 +10,8 @@ router.get('/me', requireAuth, getMe);
 if (process.env.NODE_ENV !== 'production') {
   router.post('/dev/award-xp', requireAuth, awardDevXP);
 }
+
+router.get('/prediction', requireAuth, getPrediction);
+router.get('/history', requireAuth, getHistory);
 
 export default router;

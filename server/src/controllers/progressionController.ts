@@ -44,3 +44,23 @@ export const awardDevXP = asyncHandler(async (req: AuthRequest, res: Response) =
     result
   });
 });
+
+export const getPrediction = asyncHandler(async (req: AuthRequest, res: Response) => {
+  // Mock prediction implementation
+  res.status(200).json({
+    prediction: {
+      averageDailyXP: 320,
+      daysToNextLevel: 4,
+      daysToNextRank: 12,
+      nextRank: 'C-Rank Hunter',
+      monthlyPrediction: 9600
+    }
+  });
+});
+
+export const getHistory = asyncHandler(async (req: AuthRequest, res: Response) => {
+  // Mock history implementation
+  res.status(200).json({
+    history: []
+  });
+});

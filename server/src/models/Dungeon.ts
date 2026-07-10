@@ -38,7 +38,7 @@ const DungeonSchema: Schema = new Schema({
   requiredRank: { type: String, default: 'Beginner' },
   requiredRecoveryScore: { type: Number, default: 0 },
   isHidden: { type: Boolean, default: false },
-  missions: [{ type: Schema.Types.ObjectId, ref: 'Mission' }],
+  missions: [{ type: Schema.Types.ObjectId, ref: 'QuestInstance' }],
   rewards: {
     xp: { type: Number, default: 0 },
     coins: { type: Number, default: 0 },
