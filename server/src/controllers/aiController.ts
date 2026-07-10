@@ -221,17 +221,11 @@ export const getHistory = asyncHandler(async (req: AuthRequest, res: Response) =
   res.json({ history: historyRecords });
 });
 
-export const generateWeeklyReview = asyncHandler(async (req: AuthRequest, res: Response) => {
-  const userId = req.body.userId || req.user?.id;
-  if (!userId) {
-    res.status(401).json({ message: 'Unauthorized' });
-    return;
-  }
 
+export const generateWeeklyReviewInternal = async (userId: string): Promise<string> => {
   const user = await User.findById(userId).lean();
   if (!user) {
-    res.status(404).json({ message: 'User not found' });
-    return;
+    throw new Error('User not found');
   }
 
   const context = await buildUserContext(userId.toString());
@@ -253,12 +247,29 @@ ${context}
     });
 
     const content = response.text || 'Your weekly review could not be generated.';
-    
-    // Save to WeeklyReview collection (Optional)
-    res.json({ content });
+    return content;
   } catch (error) {
     console.error('Error generating weekly review:', error);
-    res.status(500).json({ message: 'Failed to generate review' });
+    throw error;
+  }
+};
+
+export const generateWeeklyReview = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const userId = req.body.userId || req.user?.id;
+  if (!userId) {
+    res.status(401).json({ message: 'Unauthorized' });
+    return;
+  }
+  
+  try {
+    const content = await generateWeeklyReviewInternal(userId);
+    res.json({ content });
+  } catch (error: any) {
+    if (error.message === 'User not found') {
+      res.status(404).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Failed to generate weekly review' });
+    }
   }
 });
 

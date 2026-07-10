@@ -7,6 +7,7 @@ import StudySession from '../models/StudySession';
 import DSAProblem from '../models/DSAProblem';
 import WaterLog from '../models/WaterLog';
 import { sendPushNotification, sendEmail } from '../services/notificationService';
+import { generateWeeklyReviewInternal } from '../controllers/aiController';
 import axios from 'axios';
 
 // Utility to check if a specific time (HH:MM) matches current UTC hour/minute
@@ -143,18 +144,14 @@ export const startCronJobs = () => {
               // For simplicity in cron context, we could fetch it via localhost API (since it requires LLM context generation)
               // Or just construct it here. Calling our own endpoint is easiest to reuse logic.
               try {
-                // Ensure PORT is the same as where the server runs
-                const port = process.env.PORT || 5000;
-                const response = await axios.post(`http://localhost:${port}/api/assistant/weekly-review`, {
-                  userId: userId.toString()
-                });
+                const content = await generateWeeklyReviewInternal(userId.toString());
                 
-                if (response.data && response.data.content) {
+                if (content) {
                   const html = `
                     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; background: #0f172a; color: #f8fafc; padding: 20px; border-radius: 8px;">
                       <h1 style="color: #00d4ff;">Your Weekly Review, Hunter</h1>
                       <div style="background: #1e293b; padding: 15px; border-radius: 6px;">
-                        ${response.data.content.replace(/\n/g, '<br/>')}
+                        ${content.replace(/\n/g, '<br/>')}
                       </div>
                       <p style="color: #94a3b8; font-size: 12px; margin-top: 20px;">Keep leveling up.</p>
                     </div>
