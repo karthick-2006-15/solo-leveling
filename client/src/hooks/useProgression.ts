@@ -10,26 +10,7 @@ export const useProgression = () => {
   const { data: progression, isLoading, isError } = useQuery<ProgressionData>({
     queryKey: ['progression'],
     queryFn: fetchProgression,
-    enabled: isAuthenticated,
-    // Add some default mock data for UI testing if backend is not wired yet or errors out
-    initialData: {
-      level: 1,
-      rank: 'Beginner',
-      currentXP: 0,
-      xpRequired: 100,
-      totalXP: 0,
-      coins: 0,
-      currentStreak: 0,
-      longestStreak: 0,
-      dailyXP: 0,
-      weeklyXP: 0,
-      monthlyXP: 0,
-      skillPoints: 0,
-      hunterScore: 0,
-      activeTitle: 'Beginner Hunter',
-      unlockedTitles: ['Beginner Hunter'],
-      unlockedAchievements: []
-    }
+    enabled: isAuthenticated
   });
 
   const awardMutation = useMutation<AwardXPResult, Error, { source: string, amount: number }>({

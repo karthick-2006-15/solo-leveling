@@ -10,8 +10,7 @@ export const useHabits = () => {
   const { data: habits, isLoading } = useQuery({
     queryKey: ['habits'],
     queryFn: fetchHabits,
-    enabled: isAuthenticated,
-    initialData: []
+    enabled: isAuthenticated
   });
 
   const createMutation = useMutation({
@@ -38,7 +37,7 @@ export const useHabits = () => {
   });
 
   return {
-    habits,
+    habits: habits || [],
     isLoading,
     addHabit: createMutation.mutateAsync,
     markComplete: completeMutation.mutateAsync,

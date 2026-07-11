@@ -10,6 +10,9 @@ export interface IProgressionProfile extends Document {
   currentStreak: number;
   longestStreak: number;
   lastActiveDate: Date | null;
+  lastClaimDate: Date | null;
+  nextClaimAt: Date | null;
+  totalClaims: number;
   unlockedAchievements: Array<{
     achievementId: string;
     unlockedAt: Date;
@@ -38,6 +41,9 @@ const ProgressionProfileSchema: Schema = new Schema({
   currentStreak: { type: Number, default: 0 },
   longestStreak: { type: Number, default: 0 },
   lastActiveDate: { type: Date, default: null },
+  lastClaimDate: { type: Date, default: null },
+  nextClaimAt: { type: Date, default: null },
+  totalClaims: { type: Number, default: 0 },
   unlockedAchievements: [{
     achievementId: { type: String },
     unlockedAt: { type: Date, default: Date.now }

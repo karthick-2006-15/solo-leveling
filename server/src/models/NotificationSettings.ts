@@ -10,10 +10,10 @@ export interface INotificationSettings extends Document {
     sleepReminder: { enabled: boolean; time: string };
     studyReminder: { enabled: boolean; time: string };
     dsaReminder: { enabled: boolean; time: string };
+    dailySummary: { enabled: boolean; time: string };
   };
   email: {
     enabled: boolean;
-    weeklyReview: { enabled: boolean; dayOfWeek: number; time: string };
   };
   pushSubscription?: any; // Web Push subscription object
 }
@@ -44,18 +44,17 @@ const NotificationSettingsSchema: Schema = new Schema({
       enabled: { type: Boolean, default: false },
       time: { type: String, default: '20:00' }
     },
+    dailySummary: {
+      enabled: { type: Boolean, default: false },
+      time: { type: String, default: '18:00' }
+    },
     dsaReminder: {
       enabled: { type: Boolean, default: false },
       time: { type: String, default: '09:00' }
     }
   },
   email: {
-    enabled: { type: Boolean, default: false },
-    weeklyReview: {
-      enabled: { type: Boolean, default: false },
-      dayOfWeek: { type: Number, default: 0 }, // 0 = Sunday
-      time: { type: String, default: '08:00' }
-    }
+    enabled: { type: Boolean, default: false }
   },
   pushSubscription: { type: Schema.Types.Mixed, default: null }
 });

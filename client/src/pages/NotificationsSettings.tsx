@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getNotificationSettings, updateNotificationSettings, subscribeToPush, unsubscribeFromPush, testPushNotification } from '../api/notificationApi';
 import { GlassCard } from '../components/ui/GlassCard';
-import { Bell, Mail, Clock, Droplets, Utensils, BookOpen, Code, Moon } from 'lucide-react';
+import { Bell, Clock, Droplets, Utensils, BookOpen, Code, Moon } from 'lucide-react';
 import { AchievementToast } from '../components/ui/AchievementToast';
 import { useAudioStore } from '../store/useAudioStore';
 import { useSettings } from '../contexts/SettingsContext';
@@ -347,46 +347,6 @@ export const NotificationsSettings = () => {
         </div>
       </div>
 
-      {/* EMAIL SETTINGS */}
-      <h2 className="text-2xl font-bold mt-10 mb-4 flex items-center gap-2"><Mail className="text-neonBlue"/> Email Preferences</h2>
-      
-      <GlassCard className="border-white/10">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h3 className="font-bold text-lg">Weekly Review Email</h3>
-            <p className="text-sm text-textMuted">ARIA summarizes your week's progress and suggests focus areas.</p>
-          </div>
-          <input type="checkbox" checked={settings.email.enabled && settings.email.weeklyReview.enabled} 
-                 onChange={(e) => {
-                   updateNestedSetting('email', ['enabled'], e.target.checked);
-                   updateNestedSetting('email', ['weeklyReview', 'enabled'], e.target.checked);
-                 }} 
-                 className="w-6 h-6 accent-neonBlue" />
-        </div>
-        
-        <div className={`grid grid-cols-2 gap-4 ${!(settings.email.enabled && settings.email.weeklyReview.enabled) ? 'opacity-50 pointer-events-none' : ''}`}>
-          <div>
-            <label className="block text-sm text-textMuted mb-1">Day of Week</label>
-            <select value={settings.email.weeklyReview.dayOfWeek} 
-                    onChange={(e) => updateNestedSetting('email', ['weeklyReview', 'dayOfWeek'], Number(e.target.value))}
-                    className="bg-black/50 border border-white/10 rounded px-3 py-2 w-full text-white">
-              <option value={0}>Sunday</option>
-              <option value={1}>Monday</option>
-              <option value={2}>Tuesday</option>
-              <option value={3}>Wednesday</option>
-              <option value={4}>Thursday</option>
-              <option value={5}>Friday</option>
-              <option value={6}>Saturday</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm text-textMuted mb-1">Time</label>
-            <input type="time" value={settings.email.weeklyReview.time} 
-                   onChange={(e) => updateNestedSetting('email', ['weeklyReview', 'time'], e.target.value)}
-                   className="bg-black/50 border border-white/10 rounded px-3 py-2 w-full text-white" />
-          </div>
-        </div>
-      </GlassCard>
     </div>
   );
 };

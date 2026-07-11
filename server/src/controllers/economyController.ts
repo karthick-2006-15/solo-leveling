@@ -56,7 +56,10 @@ export const getEconomyStats = async (req: AuthRequest, res: Response, next: Nex
         monthlyCoins: profile.monthlyCoins,
         currentLoginStreak: profile.currentStreak,
         longestLoginStreak: profile.longestStreak,
-        missedDays: profile.missedDays
+        missedDays: profile.missedDays,
+        lastClaimDate: profile.lastClaimDate,
+        nextClaimAt: profile.nextClaimAt,
+        totalClaims: profile.totalClaims
       } 
     });
   } catch (error) {

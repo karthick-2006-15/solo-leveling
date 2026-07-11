@@ -1,5 +1,5 @@
 import express from 'express';
-import { chat, getHistory, generateMealPlan, generateWeeklyReview } from '../controllers/aiController';
+import { chat, getHistory } from '../controllers/aiController';
 import { requireAuth } from '../middleware/authMiddleware';
 import rateLimit from 'express-rate-limit';
 
@@ -15,7 +15,5 @@ router.use(requireAuth);
 
 router.post('/chat', chatLimiter, chat);
 router.get('/history', getHistory);
-router.post('/meal-plan', generateMealPlan);
-router.post('/weekly-review', generateWeeklyReview);
 
 export default router;

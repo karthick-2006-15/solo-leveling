@@ -16,13 +16,13 @@ class EconomyService {
     const today = new Date(now);
     today.setUTCHours(0, 0, 0, 0);
 
-    // Use the generic lastActiveDate for login streak purposes
-    if (profile.lastActiveDate) {
-      const last = new Date(profile.lastActiveDate);
+    // Use the dedicated lastClaimDate for login streak purposes
+    if (profile.lastClaimDate) {
+      const last = new Date(profile.lastClaimDate);
       last.setUTCHours(0, 0, 0, 0);
 
       const diffTime = Math.abs(today.getTime() - last.getTime());
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
       if (diffDays === 0) {
         throw new Error('Daily login already claimed today');
@@ -41,6 +41,11 @@ class EconomyService {
       profile.longestStreak = profile.currentStreak;
     }
 
+    profile.lastClaimDate = now;
+    const nextClaim = new Date(today);
+    nextClaim.setUTCDate(nextClaim.getUTCDate() + 1);
+    profile.nextClaimAt = nextClaim;
+    profile.totalClaims = (profile.totalClaims || 0) + 1;
     profile.lastActiveDate = now;
     await profile.save(); // Save streak first
 

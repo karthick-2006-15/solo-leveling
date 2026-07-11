@@ -279,8 +279,7 @@ export const Assistant: React.FC = () => {
         {/* Quick Actions Panel */}
         <div className="mb-4 grid grid-cols-2 md:grid-cols-4 gap-2">
           {[
-            { label: 'Workout Plan', prompt: 'Generate a new workout recommendation for today based on my level.' },
-            { label: 'Meal Plan', prompt: 'Provide a nutrition recommendation and meal planner for today.' },
+            { label: 'Suggest Workout', prompt: 'Create a quick 15-minute HIIT workout for today.' },
             { label: 'Study Planner', prompt: 'Create a study planner for my current active skills.' },
             { label: 'Habit Analysis', prompt: 'Analyze my habits and suggest improvements.' },
             { label: 'Daily Schedule', prompt: 'Create an optimal daily schedule combining my missions, workouts, and study.' },
