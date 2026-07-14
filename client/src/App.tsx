@@ -13,6 +13,7 @@ import { BossWarning } from './components/ui/BossWarning';
 import { DungeonPortal } from './components/ui/DungeonPortal';
 import { HunterTrainingBackground } from './components/training/HunterTrainingBackground';
 import { SettingsProvider } from './contexts/SettingsContext';
+import { GlobalThemeState } from './components/ui/GlobalThemeState';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -41,12 +42,13 @@ function App() {
     <SettingsProvider>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
+          <GlobalThemeState />
           {/* Cinematic Overlays */}
           <LevelUpCinematic />
           <BossWarning />
           <DungeonPortal />
 
-          <div className="min-h-screen flex flex-col relative overflow-hidden bg-[var(--color-system-black)] pb-16 md:pb-0 md:pt-16 selection:bg-cyan-900 selection:text-white">
+          <div className="min-h-screen flex flex-col relative overflow-hidden bg-[var(--color-system-black)] pb-safe md:pb-0 md:pt-16 selection:bg-cyan-900 selection:text-white">
             
             {!hasBooted && <SystemBootSequence onComplete={handleBootComplete} />}
             
@@ -75,6 +77,10 @@ function App() {
             <div className="relative z-10 flex flex-col flex-grow w-full">
               <BottomNav />
               <main className="flex-grow p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full relative">
+                
+                {/* Global Grid Overlay */}
+                <div className="absolute inset-0 bg-[linear-gradient(rgba(0,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none mix-blend-screen" />
+
                 <ErrorBoundary>
                   <Suspense fallback={
                     <div className="fixed inset-0 flex items-center justify-center bg-black/80 z-[100]">

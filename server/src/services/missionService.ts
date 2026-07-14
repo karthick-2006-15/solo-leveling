@@ -259,5 +259,58 @@ export const missionService = {
 
   getBadges: async (userId: string) => {
     return Badge.find({ userId }).sort({ earnedAt: -1 });
+  },
+
+  getShadowArmy: async (userId: string) => {
+    const yesterday = new Date();
+    yesterday.setUTCHours(0,0,0,0);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    return QuestInstance.find({ 
+      userId, 
+      status: 'failed', 
+      isShadow: true,
+      date: yesterday
+    });
+  },
+
+  resurrectShadow: async (userId: string, shadowQuestId: string) => {
+    const shadowQuest = await QuestInstance.findOne({ _id: shadowQuestId, userId, status: 'failed', isShadow: true });
+    if (!shadowQuest) {
+      throw new Error('Shadow quest not found or already resurrected');
+    }
+
+    // Clone it for today
+    const today = getStartOfDay();
+    
+    // Make sure we haven't already resurrected it today
+    const existing = await QuestInstance.findOne({ userId, date: today, templateId: shadowQuest.templateId, isShadow: true });
+    if (existing) {
+      throw new Error('Shadow already resurrected today');
+    }
+
+    const newQuest = new QuestInstance({
+      userId,
+      date: today,
+      templateId: shadowQuest.templateId,
+      title: `[SHADOW] ${shadowQuest.title}`,
+      description: `Arise. ${shadowQuest.description}`,
+      targetValue: shadowQuest.targetValue,
+      currentProgress: 0,
+      xpReward: Math.floor(shadowQuest.xpReward * 0.5), // Half XP for resurrected
+      coinReward: Math.floor(shadowQuest.coinReward * 0.5),
+      status: 'available',
+      isShadow: true,
+      type: shadowQuest.type
+    });
+
+    await newQuest.save();
+    
+    // Mark the old shadow as 'abandoned' or 'completed' so it doesn't show up again?
+    // Let's change status to 'abandoned' to signify it was consumed
+    shadowQuest.status = 'abandoned';
+    await shadowQuest.save();
+
+    return newQuest;
   }
 };

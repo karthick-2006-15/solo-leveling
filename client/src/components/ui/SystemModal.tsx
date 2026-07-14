@@ -47,19 +47,19 @@ export const SystemModal: React.FC<SystemModalProps> = ({
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 20 }}
             transition={{ type: 'spring', bounce: 0.3 }}
-            className="relative z-10 w-full max-w-lg max-h-[90vh] flex flex-col"
+            className="relative z-10 w-full max-w-[95vw] md:max-w-lg max-h-[90vh] flex flex-col"
           >
             <SystemWindow title={title} variant={variant} className="w-full flex-1 flex flex-col overflow-hidden" innerClassName="p-0 flex flex-col h-full max-h-[calc(90vh-32px)]">
-              <div className="flex justify-between items-center p-4 border-b border-[rgba(255,255,255,0.05)] bg-[rgba(0,0,0,0.2)]">
-                <h2 className="font-display font-bold uppercase tracking-widest text-white">{title}</h2>
+              <div className="flex justify-between items-center p-3 md:p-4 border-b border-[rgba(255,255,255,0.05)] bg-[rgba(0,0,0,0.2)]">
+                <h2 className="font-display font-bold uppercase tracking-widest text-white text-sm md:text-base">{title}</h2>
                 <button 
                   onClick={onClose}
-                  className="text-[var(--color-system-text-dim)] hover:text-white transition-colors"
+                  className="min-w-[44px] min-h-[44px] flex items-center justify-center text-[var(--color-system-text-dim)] hover:text-white transition-colors"
                 >
                   <X size={20} />
                 </button>
               </div>
-              <div className="overflow-y-auto p-6 custom-scrollbar">
+              <div className="overflow-y-auto p-4 md:p-6 custom-scrollbar">
                 {children}
               </div>
             </SystemWindow>

@@ -14,5 +14,12 @@ export const academicApi = {
       body: JSON.stringify(data)
     });
     return { data: await res.json() };
+  },
+  completeTask: async (taskId: string, taskType: 'assignment' | 'exam') => {
+    const res = await fetchWithAuth(`${API_URL}/academics/complete-task`, {
+      method: 'POST',
+      body: JSON.stringify({ taskId, taskType })
+    });
+    return { data: await res.json() };
   }
 };

@@ -19,7 +19,7 @@ export const Story: React.FC = () => {
       />
 
       <div className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
-        <div className="max-w-4xl mx-auto flex flex-col gap-8 pb-20">
+        <div className="max-w-4xl mx-auto flex flex-col gap-4 md:gap-8 pb-20">
           {!chapters || chapters.length === 0 ? (
             <div className="text-center py-20">
               <Lock className="w-12 h-12 text-gray-700 mx-auto mb-4" />
@@ -33,14 +33,14 @@ export const Story: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-black/60 border border-[var(--color-system-border)] rounded-xl p-8 relative overflow-hidden"
+                className="hud-glass corner-brackets p-4 md:p-8 relative overflow-hidden"
               >
                 <div className="absolute top-0 left-0 w-1 h-full bg-cyan-500" />
                 
                 <p className="text-cyan-400 font-mono text-sm uppercase tracking-widest mb-2">
                   Chapter {chapter.chapterNumber}
                 </p>
-                <h2 className="text-3xl font-display font-bold uppercase tracking-widest text-white mb-6">
+                <h2 className="text-xl md:text-3xl font-display font-bold uppercase tracking-widest text-white mb-4 md:mb-6">
                   {chapter.title}
                 </h2>
                 

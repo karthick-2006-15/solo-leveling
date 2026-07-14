@@ -37,5 +37,20 @@ export const missionController = {
     // In a real implementation, we would save the vitals to calibrate missions.
     // For now, just return success.
     res.json({ success: true, message: 'Check-in successful' });
+  }),
+
+  getShadowArmy: asyncHandler(async (req: AuthRequest, res: Response) => {
+    if (!req.user) throw new AppError('Not authenticated', 401);
+    const shadows = await missionService.getShadowArmy(req.user.id);
+    res.json({ shadows });
+  }),
+
+  resurrectShadow: asyncHandler(async (req: AuthRequest, res: Response) => {
+    if (!req.user) throw new AppError('Not authenticated', 401);
+    const { shadowId } = req.body;
+    if (!shadowId) throw new AppError('Missing shadowId', 400);
+
+    const resurrectedQuest = await missionService.resurrectShadow(req.user.id, shadowId);
+    res.json({ quest: resurrectedQuest });
   })
 };

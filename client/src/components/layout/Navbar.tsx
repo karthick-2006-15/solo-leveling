@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/useAuthStore';
-import { LogOut, User as UserIcon, LayoutDashboard, CheckSquare, Dumbbell, Apple, Code2, Network, Trophy, Activity, Bot } from 'lucide-react';
+import { LogOut, User as UserIcon, LayoutDashboard, CheckSquare, Dumbbell, Apple, Code2, Network, Trophy, Activity } from 'lucide-react';
+import { AriaCore } from '../aria/AriaCore';
 
 export const Navbar: React.FC = () => {
   const { user, logout } = useAuthStore();
@@ -54,8 +55,8 @@ export const Navbar: React.FC = () => {
             <Link to="/analytics" className="text-textMuted hover:text-neonBlue transition-colors" title="Analytics">
               <Activity size={20} />
             </Link>
-            <Link to="/assistant" className="text-textMuted hover:text-neonPurple transition-colors" title="ARIA Assistant">
-              <Bot size={20} />
+            <Link to="/assistant" className="text-textMuted hover:text-neonPurple transition-colors" title="Iggris Companion">
+              <AriaCore size={20} className="hover:scale-110 transition-transform duration-300" />
             </Link>
             <Link to="/profile" className="text-textMuted hover:text-neonPurple transition-colors" title="Profile">
               <UserIcon size={20} />

@@ -7,8 +7,23 @@ export interface IInnerMonarch extends Document {
   monarchLevel: number;
   evolutionStage: 'Dormant' | 'Awakening' | 'Disciplined Mind' | 'Iron Will' | 'Elite Monarch' | 'Supreme Monarch' | 'Legendary Monarch';
   
-  // Attributes (0-100)
+  // Attributes
   attributes: {
+    STR: number;
+    AGI: number;
+    END: number;
+    INT: number;
+    WIS: number;
+    PER: number;
+    CHA: number;
+    MNT: number;
+    FOC: number;
+    DIS: number;
+    REC: number;
+    WIL: number;
+    
+    // Legacy attributes to keep compatibility
+    dopamineBalance: number;
     willpower: number;
     focus: number;
     discipline: number;
@@ -19,6 +34,7 @@ export interface IInnerMonarch extends Document {
     patience: number;
     adaptability: number;
     selfControl: number;
+    corruption: number;
   };
   
   // Balance
@@ -52,6 +68,8 @@ export interface IInnerMonarch extends Document {
       patience: number;
       adaptability: number;
       selfControl: number;
+      corruption: number;
+      dopamineBalance: number;
     }
   }>;
 
@@ -70,6 +88,21 @@ const InnerMonarchSchema: Schema = new Schema({
   },
   
   attributes: {
+    STR: { type: Number, default: 10 },
+    AGI: { type: Number, default: 10 },
+    END: { type: Number, default: 10 },
+    INT: { type: Number, default: 10 },
+    WIS: { type: Number, default: 10 },
+    PER: { type: Number, default: 10 },
+    CHA: { type: Number, default: 10 },
+    MNT: { type: Number, default: 10 },
+    FOC: { type: Number, default: 10 },
+    DIS: { type: Number, default: 10 },
+    REC: { type: Number, default: 10 },
+    WIL: { type: Number, default: 10 },
+
+    // Legacy
+    dopamineBalance: { type: Number, default: 100, min: 0, max: 100 },
     willpower: { type: Number, default: 10, min: 0, max: 100 },
     focus: { type: Number, default: 10, min: 0, max: 100 },
     discipline: { type: Number, default: 10, min: 0, max: 100 },
@@ -79,7 +112,8 @@ const InnerMonarchSchema: Schema = new Schema({
     consistency: { type: Number, default: 10, min: 0, max: 100 },
     patience: { type: Number, default: 10, min: 0, max: 100 },
     adaptability: { type: Number, default: 10, min: 0, max: 100 },
-    selfControl: { type: Number, default: 10, min: 0, max: 100 }
+    selfControl: { type: Number, default: 10, min: 0, max: 100 },
+    corruption: { type: Number, default: 0, min: 0, max: 100 }
   },
 
   balance: {
@@ -107,7 +141,9 @@ const InnerMonarchSchema: Schema = new Schema({
       consistency: Number,
       patience: Number,
       adaptability: Number,
-      selfControl: Number
+      selfControl: Number,
+      corruption: Number,
+      dopamineBalance: Number
     }
   }]
 

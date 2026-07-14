@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getMe, awardDevXP, getPrediction, getHistory } from '../controllers/progressionController';
+import { getMe, awardDevXP, getPrediction, getHistory, completeFocusSession } from '../controllers/progressionController';
 import { requireAuth } from '../middleware/authMiddleware';
 
 const router = Router();
@@ -12,6 +12,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 router.get('/prediction', requireAuth, getPrediction);
+router.post('/focus/complete', requireAuth, completeFocusSession);
 router.get('/history', requireAuth, getHistory);
 
 export default router;

@@ -30,4 +30,11 @@ export const healthApi = {
       method: 'GET',
     });
   },
+
+  getTodayStatus: async (dateStr?: string) => {
+    const url = dateStr ? `${API_URL}/health/today?date=${dateStr}` : `${API_URL}/health/today`;
+    return fetchWithAuth(url, {
+      method: 'GET',
+    });
+  },
 };

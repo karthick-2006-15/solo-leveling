@@ -8,6 +8,7 @@ import DSAProblem from '../models/DSAProblem';
 import WaterLog from '../models/WaterLog';
 import { sendPushNotification, sendEmail } from '../services/notificationService';
 import axios from 'axios';
+import { ariaProactiveService } from '../services/ariaProactiveService';
 
 // Utility to check if a specific time (HH:MM) matches current UTC hour/minute
 const isTimeMatch = (timeString: string, currentHour: number, currentMinute: number): boolean => {
@@ -138,4 +139,14 @@ export const startCronJobs = () => {
   });
 
   console.log('Notification cron jobs started.');
+
+  // ARIA Proactive Interventions - run every 4 hours
+  cron.schedule('0 */4 * * *', async () => {
+    try {
+      await ariaProactiveService.runGlobalInterventions();
+    } catch (err) {
+      console.error('Error running ARIA proactive interventions:', err);
+    }
+  });
+  console.log('ARIA proactive interventions cron started.');
 };

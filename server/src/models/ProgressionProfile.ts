@@ -7,6 +7,8 @@ export interface IProgressionProfile extends Document {
   totalXP: number;
   coins: number;
   rank: string;
+  hunterClass: string;
+  hunterTitle: string;
   currentStreak: number;
   longestStreak: number;
   lastActiveDate: Date | null;
@@ -37,7 +39,9 @@ const ProgressionProfileSchema: Schema = new Schema({
   currentXP: { type: Number, default: 0 },
   totalXP: { type: Number, default: 0 },
   coins: { type: Number, default: 0 },
-  rank: { type: String, default: 'Beginner' },
+  rank: { type: String, default: 'E-Rank' },
+  hunterClass: { type: String, default: 'None' },
+  hunterTitle: { type: String, default: 'Beginner Hunter' },
   currentStreak: { type: Number, default: 0 },
   longestStreak: { type: Number, default: 0 },
   lastActiveDate: { type: Date, default: null },

@@ -38,3 +38,19 @@ export const triggerManualInnerBattle = async (req: AuthRequest, res: Response, 
     next(error);
   }
 };
+
+export const adjustAttributes = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const { changes } = req.body;
+    if (!changes || typeof changes !== 'object') {
+      return next(new AppError('Invalid changes payload', 400));
+    }
+    const monarch = await monarchService.adjustAttributes(req.user!.id, changes);
+    res.status(200).json({
+      status: 'success',
+      data: { monarch }
+    });
+  } catch (error) {
+    next(error);
+  }
+};

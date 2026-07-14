@@ -118,10 +118,10 @@ export const DSA: React.FC = () => {
             </h2>
             <form onSubmit={handleLog} className="space-y-4">
               <div>
-                <input name="title" type="text" placeholder="Problem Designation (e.g. Two Sum)" className="w-full bg-black/50 border border-indigo-900/50 rounded px-4 py-3 text-white font-mono text-sm focus:border-indigo-400 focus:outline-none transition-colors uppercase tracking-widest" required />
+                <input name="title" type="text" placeholder="Problem Designation (e.g. Two Sum)" className="w-full bg-black/50 border border-indigo-900/50 rounded px-4 py-3 text-white font-mono text-base md:text-sm focus:border-indigo-400 focus:outline-none transition-colors uppercase tracking-widest" required />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <select name="topic" className="w-full bg-black/50 border border-indigo-900/50 rounded px-4 py-3 text-white font-mono text-xs focus:border-indigo-400 focus:outline-none transition-colors appearance-none uppercase" required>
+                <select name="topic" className="w-full bg-black/50 border border-indigo-900/50 rounded px-4 py-3 text-white font-mono text-base md:text-xs focus:border-indigo-400 focus:outline-none transition-colors appearance-none uppercase" required>
                   <option value="">SELECT TOPIC</option>
                   <option value="arrays">Arrays</option>
                   <option value="strings">Strings</option>
@@ -132,7 +132,7 @@ export const DSA: React.FC = () => {
                   <option value="math">Math</option>
                   <option value="other">Other</option>
                 </select>
-                <select name="difficulty" className="w-full bg-black/50 border border-indigo-900/50 rounded px-4 py-3 text-white font-mono text-xs focus:border-indigo-400 focus:outline-none transition-colors appearance-none uppercase" required>
+                <select name="difficulty" className="w-full bg-black/50 border border-indigo-900/50 rounded px-4 py-3 text-white font-mono text-base md:text-xs focus:border-indigo-400 focus:outline-none transition-colors appearance-none uppercase" required>
                   <option value="">THREAT LEVEL</option>
                   <option value="easy">Easy (E-Rank)</option>
                   <option value="medium">Medium (C-Rank)</option>
@@ -140,13 +140,13 @@ export const DSA: React.FC = () => {
                 </select>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <select name="platform" className="w-full bg-black/50 border border-indigo-900/50 rounded px-4 py-3 text-white font-mono text-xs focus:border-indigo-400 focus:outline-none transition-colors appearance-none uppercase" required>
+                <select name="platform" className="w-full bg-black/50 border border-indigo-900/50 rounded px-4 py-3 text-white font-mono text-base md:text-xs focus:border-indigo-400 focus:outline-none transition-colors appearance-none uppercase" required>
                   <option value="leetcode">LeetCode</option>
                   <option value="hackerrank">HackerRank</option>
                   <option value="codeforces">Codeforces</option>
                   <option value="other">Other</option>
                 </select>
-                <input name="time" type="number" placeholder="TIME (MIN)" className="w-full bg-black/50 border border-indigo-900/50 rounded px-4 py-3 text-white font-mono text-sm focus:border-indigo-400 focus:outline-none transition-colors uppercase" />
+                <input name="time" type="number" placeholder="TIME (MIN)" className="w-full bg-black/50 border border-indigo-900/50 rounded px-4 py-3 text-white font-mono text-base md:text-sm focus:border-indigo-400 focus:outline-none transition-colors uppercase" />
               </div>
               <button type="submit" onClick={() => play('click')} className="w-full py-3 bg-indigo-950 border border-indigo-400 text-indigo-300 hover:bg-indigo-400 hover:text-black rounded font-display tracking-[0.2em] uppercase transition-colors shadow-[0_0_15px_rgba(129,140,248,0.2)]">
                 SUBMIT REPORT

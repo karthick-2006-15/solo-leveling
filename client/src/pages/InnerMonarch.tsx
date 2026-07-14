@@ -49,13 +49,41 @@ export const InnerMonarch: React.FC = () => {
 
   const shadowWinning = monarch.latestShadowStrength > monarch.latestInnerStrength;
 
-  // Mock Insights
-  const insights = [
-    "Your Discipline is becoming your strongest attribute.",
-    "The Shadow of Procrastination is losing influence.",
-    "Willpower increased slightly from yesterday's recovery.",
-    "Consistency requires daily commitment. Do not break the streak."
-  ];
+  // Generate Dynamic Insights
+  const insights = [];
+  
+  // Find highest attribute
+  const legacyAttrs = ['willpower', 'focus', 'discipline', 'wisdom', 'resilience', 'courage', 'consistency', 'patience', 'adaptability', 'selfControl'];
+  let maxAttr = legacyAttrs[0];
+  let maxVal = attributes[maxAttr as keyof typeof attributes] || 0;
+  let minAttr = legacyAttrs[0];
+  let minVal = attributes[minAttr as keyof typeof attributes] || 0;
+
+  for (const key of legacyAttrs) {
+    const val = attributes[key as keyof typeof attributes] as number;
+    if (val > maxVal) { maxVal = val; maxAttr = key; }
+    if (val < minVal) { minVal = val; minAttr = key; }
+  }
+
+  insights.push(`Your ${maxAttr.charAt(0).toUpperCase() + maxAttr.slice(1)} is becoming your strongest attribute (${maxVal.toFixed(1)}).`);
+  
+  if (shadowWinning) {
+    insights.push(`The Shadow of Procrastination is gaining influence. You must counteract this immediately.`);
+  } else {
+    insights.push(`The Shadow's influence is waning. Keep pressing forward.`);
+  }
+
+  if (attributes.corruption > 50) {
+    insights.push(`Corruption levels are dangerously high (${attributes.corruption.toFixed(1)}%). Implement recovery protocols.`);
+  } else {
+    insights.push(`Your system remains pure. Corruption is under control.`);
+  }
+
+  if (minVal < 20) {
+    insights.push(`Your ${minAttr.charAt(0).toUpperCase() + minAttr.slice(1)} is critically low (${minVal.toFixed(1)}). Focus on improving this weakness.`);
+  } else {
+    insights.push(`Your baseline stats are stable. Consistency requires daily commitment. Do not break the streak.`);
+  }
 
   return (
     <div className="relative min-h-screen text-white font-mono">
@@ -72,27 +100,27 @@ export const InnerMonarch: React.FC = () => {
             title="Inner Monarch" 
             subtitle="The manifestation of your internal strength." 
           />
-          <div className="flex gap-4">
+          <div className="flex gap-3 md:gap-4">
             <div className="text-right">
               <div className="text-[10px] text-gray-500 uppercase tracking-widest font-mono">Evolution Stage</div>
-              <div className="text-2xl font-display text-indigo-400 font-bold uppercase tracking-wider text-shadow-glow">
+              <div className="text-xl md:text-2xl font-display text-indigo-400 font-bold uppercase tracking-wider text-shadow-glow">
                 {monarch.evolutionStage}
               </div>
             </div>
             <div className="text-right border-l border-indigo-900/50 pl-4">
               <div className="text-[10px] text-gray-500 uppercase tracking-widest font-mono">Monarch Level</div>
-              <div className="text-2xl font-display text-cyan-400 font-bold tracking-wider">
+              <div className="text-xl md:text-2xl font-display text-cyan-400 font-bold tracking-wider">
                 {monarch.monarchLevel}
               </div>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
           
           {/* RADAR CHART */}
           <div className="lg:col-span-2">
-            <SystemWindow title="Monarch Attributes" className="h-[450px]" innerClassName="p-0 h-full flex flex-col relative">
+            <SystemWindow title="Monarch Attributes" className="h-[350px] md:h-[450px]" innerClassName="p-0 h-full flex flex-col relative">
               <div className="absolute inset-0 bg-black/60 pointer-events-none" />
               <div className="flex-1 w-full relative z-10 p-4 flex flex-col items-center">
                 <ResponsiveContainer width="100%" height="100%">
@@ -163,7 +191,7 @@ export const InnerMonarch: React.FC = () => {
                   </div>
                 )}
 
-                <PrimaryButton onClick={() => battleMutation.mutate()} disabled={battleMutation.isPending} className="mt-2 text-[10px] !py-2">
+                <PrimaryButton onClick={() => battleMutation.mutate()} disabled={battleMutation.isPending} className="mt-2 text-[10px] !py-2 min-h-[44px]">
                   EVALUATE BATTLE (DEV)
                 </PrimaryButton>
               </div>
@@ -181,7 +209,7 @@ export const InnerMonarch: React.FC = () => {
         </div>
 
         {/* BOTTOM SECTION: ABILITIES & CHAPTERS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-6">
            <SystemWindow title="Monarch Abilities">
              {monarch.unlockedAbilities?.length > 0 ? (
                <div className="flex flex-wrap gap-2">

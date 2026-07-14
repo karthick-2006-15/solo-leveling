@@ -28,7 +28,11 @@ export const workoutService = {
 
     let totalVolume = 0;
     const newPRs = [];
-    const prDocsToSave = [];
+    const prOperations: Array<{
+      type: 'create' | 'update';
+      prDoc?: any;
+      prData?: any;
+    }> = [];
 
     // Calculate volume & PRs
     for (const ex of exercises) {
@@ -50,22 +54,27 @@ export const workoutService = {
         const pr = await workoutRepository.findPR(userId, exerciseNameLower);
         if (!pr) {
           // New PR
-          const prData = {
-            userId: userId as any,
-            exerciseName: exerciseNameLower,
-            maxWeight: maxWeightInSet,
-            repsAtMaxWeight,
-          };
-          const createdPr = await workoutRepository.createPR(prData);
+          prOperations.push({
+            type: 'create',
+            prData: {
+              userId: userId as any,
+              exerciseName: exerciseNameLower,
+              maxWeight: maxWeightInSet,
+              repsAtMaxWeight,
+            }
+          });
           newPRs.push({ exerciseName: ex.name, maxWeight: maxWeightInSet, reps: repsAtMaxWeight });
-          prDocsToSave.push(createdPr);
         } else if (maxWeightInSet > pr.maxWeight) {
           // Updated PR
-          pr.maxWeight = maxWeightInSet;
-          pr.repsAtMaxWeight = repsAtMaxWeight;
-          pr.achievedAt = new Date();
+          prOperations.push({
+            type: 'update',
+            prDoc: pr,
+            prData: {
+              maxWeight: maxWeightInSet,
+              repsAtMaxWeight
+            }
+          });
           newPRs.push({ exerciseName: ex.name, maxWeight: maxWeightInSet, reps: repsAtMaxWeight });
-          prDocsToSave.push(pr);
         }
       }
     }
@@ -78,12 +87,23 @@ export const workoutService = {
       durationMinutes
     });
 
-    // Update PRs with the new sessionId
+    // Create / Update PRs with the new sessionId
     const prResults = [];
-    for (let i = 0; i < prDocsToSave.length; i++) {
-      const prDoc = prDocsToSave[i];
-      prDoc.sessionId = session._id;
-      await workoutRepository.savePR(prDoc);
+    for (let i = 0; i < prOperations.length; i++) {
+      const op = prOperations[i];
+      if (op.type === 'create') {
+        await workoutRepository.createPR({
+          ...op.prData,
+          sessionId: session._id
+        });
+      } else {
+        const pr = op.prDoc;
+        pr.maxWeight = op.prData.maxWeight;
+        pr.repsAtMaxWeight = op.prData.repsAtMaxWeight;
+        pr.sessionId = session._id;
+        pr.achievedAt = new Date();
+        await workoutRepository.savePR(pr);
+      }
       prResults.push(newPRs[i]);
     }
 

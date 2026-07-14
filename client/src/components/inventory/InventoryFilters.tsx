@@ -22,7 +22,7 @@ export const InventoryFilters: React.FC<InventoryFiltersProps> = ({ filters, set
           placeholder="SEARCH INVENTORY..." 
           value={filters.search || ''}
           onChange={(e) => handleChange('search', e.target.value)}
-          className="w-full bg-black/40 border border-cyan-900/50 rounded-lg py-2 pl-10 pr-4 text-sm text-cyan-100 placeholder:text-cyan-900 focus:outline-none focus:border-cyan-500 font-mono"
+          className="w-full bg-black/40 border border-cyan-900/50 rounded-lg py-2 pl-10 pr-4 text-base md:text-sm text-cyan-100 placeholder:text-cyan-900 focus:outline-none focus:border-cyan-500 font-mono"
         />
       </div>
 
@@ -32,7 +32,7 @@ export const InventoryFilters: React.FC<InventoryFiltersProps> = ({ filters, set
         <select 
           value={filters.category || ''}
           onChange={(e) => handleChange('category', e.target.value)}
-          className="bg-black/40 border border-gray-800 rounded-lg py-2 px-3 text-sm text-gray-300 focus:outline-none focus:border-cyan-500 font-mono w-full md:w-[150px]"
+          className="bg-black/40 border border-gray-800 rounded-lg py-2 px-3 text-base md:text-sm text-gray-300 focus:outline-none focus:border-cyan-500 font-mono w-full md:w-[150px]"
         >
           <option value="">ALL CATEGORIES</option>
           <option value="Consumable">CONSUMABLES</option>
@@ -49,7 +49,7 @@ export const InventoryFilters: React.FC<InventoryFiltersProps> = ({ filters, set
         <select 
           value={filters.rarity || ''}
           onChange={(e) => handleChange('rarity', e.target.value)}
-          className="bg-black/40 border border-gray-800 rounded-lg py-2 px-3 text-sm text-gray-300 focus:outline-none focus:border-cyan-500 font-mono w-full md:w-[150px]"
+          className="bg-black/40 border border-gray-800 rounded-lg py-2 px-3 text-base md:text-sm text-gray-300 focus:outline-none focus:border-cyan-500 font-mono w-full md:w-[150px]"
         >
           <option value="">ALL RARITIES</option>
           <option value="Common" className="text-gray-400">COMMON</option>
@@ -68,7 +68,7 @@ export const InventoryFilters: React.FC<InventoryFiltersProps> = ({ filters, set
         <select 
           value={filters.sortBy || 'newest'}
           onChange={(e) => handleChange('sortBy', e.target.value)}
-          className="bg-black/40 border border-gray-800 rounded-lg py-2 px-3 text-sm text-gray-300 focus:outline-none focus:border-cyan-500 font-mono w-full md:w-[150px]"
+          className="bg-black/40 border border-gray-800 rounded-lg py-2 px-3 text-base md:text-sm text-gray-300 focus:outline-none focus:border-cyan-500 font-mono w-full md:w-[150px]"
         >
           <option value="newest">NEWEST FIRST</option>
           <option value="oldest">OLDEST FIRST</option>

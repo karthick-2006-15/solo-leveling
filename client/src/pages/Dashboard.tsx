@@ -10,6 +10,7 @@ import { useSkills } from '../hooks/useSkills';
 import { useMissions } from '../hooks/useMissions';
 import { useAuthStore } from '../store/useAuthStore';
 import { useEconomy } from '../hooks/useEconomy';
+import { useMonarch } from '../hooks/useMonarch';
 import { Link } from 'react-router-dom';
 
 import { LevelUpModal } from '../components/ui/LevelUpModal';
@@ -23,6 +24,7 @@ import { RecentAchievements } from '../components/dashboard/RecentAchievements';
 import { MissionBoard } from '../components/missions/MissionBoard';
 import { DailyLoginBanner } from '../components/dashboard/DailyLoginBanner';
 import { PerfectDayWidget } from '../components/dashboard/PerfectDayWidget';
+import { FocusTimerWidget } from '../components/dashboard/FocusTimerWidget';
 
 export const Dashboard: React.FC = () => {
   const { user } = useAuthStore();
@@ -30,14 +32,15 @@ export const Dashboard: React.FC = () => {
   const { habits, isLoading: habLoading } = useHabits();
   const { isLoading: workLoading } = useWorkouts();
   const { logs: foodLogs, isLoading: nutLoading } = useNutrition();
-  const { skills, isLoading: skillsLoading } = useSkills();
+  const { isLoading: skillsLoading } = useSkills();
   const { quests, boss, questsLoading, bossLoading } = useMissions();
   const { timeline } = useEconomy();
+  const { monarchData, isLoading: monarchLoading } = useMonarch();
 
   const [levelUpData, setLevelUpData] = useState<{isOpen: boolean, level: number, rank?: string, rankChanged?: boolean}>({ isOpen: false, level: 0 });
   const [toasts, setToasts] = useState<ToastData[]>([]);
 
-  if (progLoading || habLoading || workLoading || nutLoading || skillsLoading || questsLoading || bossLoading || !progression) {
+  if (progLoading || habLoading || workLoading || nutLoading || skillsLoading || questsLoading || bossLoading || monarchLoading || !progression) {
     return (
       <div className="fixed inset-0 bg-[#00050b] flex flex-col items-center justify-center z-50">
         <div className="relative w-24 h-24">
@@ -93,10 +96,10 @@ export const Dashboard: React.FC = () => {
         initial={{ y: -20, opacity: 0 }} 
         animate={{ y: 0, opacity: 1 }} 
         transition={{ type: 'spring', stiffness: 100, damping: 20 }}
-        className="relative bg-black/60 border border-cyan-900/50 rounded-2xl p-6 md:p-8 backdrop-blur-xl shadow-[0_0_40px_rgba(0,0,0,0.8)] overflow-hidden group"
+        className="relative hud-glass corner-brackets p-6 md:p-8 group"
       >
-        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-cyan-500/0 via-cyan-500/50 to-cyan-500/0 opacity-50" />
-        <div className="absolute inset-0 bg-cyan-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-cyan-400/0 via-cyan-400/50 to-cyan-400/0 opacity-50" />
+        <div className="absolute inset-0 bg-cyan-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
         
         <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
             <HunterRankBadge level={level} />
@@ -113,6 +116,9 @@ export const Dashboard: React.FC = () => {
                 <p className="font-mono text-cyan-500 text-[11px] tracking-[0.4em] uppercase opacity-80">
                   System Synchronized
                 </p>
+                <Link to="/status" className="ml-auto md:ml-4 font-mono text-cyan-50 text-[10px] bg-cyan-900/50 hover:bg-cyan-500 hover:text-black border border-cyan-500 px-4 py-1.5 rounded-full uppercase tracking-[0.2em] transition-all shadow-[0_0_10px_rgba(0,229,255,0.3)]">
+                  Open Status
+                </Link>
               </div>
             </div>
 
@@ -133,6 +139,36 @@ export const Dashboard: React.FC = () => {
                 />
               </div>
             </div>
+
+            {/* Monarch Vitals (Willpower / Corruption) */}
+            {monarchData?.monarch?.attributes && (
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <div className="space-y-1">
+                  <div className="flex justify-between items-end font-mono uppercase tracking-widest text-[9px]">
+                    <span className="text-indigo-400 flex items-center gap-1"><Shield size={10} /> WILLPOWER</span>
+                    <span className="text-indigo-500">{Math.round(monarchData.monarch.attributes.willpower)}%</span>
+                  </div>
+                  <div className="w-full h-1 bg-black border border-indigo-900/50 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)] transition-all duration-1000"
+                      style={{ width: `${monarchData.monarch.attributes.willpower}%` }}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <div className="flex justify-between items-end font-mono uppercase tracking-widest text-[9px]">
+                    <span className="text-red-500 flex items-center gap-1"><Shield size={10} /> CORRUPTION</span>
+                    <span className="text-red-600">{Math.round(monarchData.monarch.attributes.corruption)}%</span>
+                  </div>
+                  <div className="w-full h-1 bg-black border border-red-900/50 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-red-600 shadow-[0_0_8px_rgba(220,38,38,0.5)] transition-all duration-1000"
+                      style={{ width: `${monarchData.monarch.attributes.corruption}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -170,9 +206,9 @@ export const Dashboard: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 * i, type: 'spring' }}
             key={stat.label} 
-            className={`relative bg-black/50 border ${stat.border} rounded-xl p-5 flex flex-col items-center justify-center gap-3 backdrop-blur-md overflow-hidden group hover:${stat.border.replace('/30', '/80')} transition-colors duration-300 ${stat.glow}`}
+            className={`relative hud-glass corner-brackets border ${stat.border} p-5 flex flex-col items-center justify-center gap-3 group hover:${stat.border.replace('/30', '/80')} transition-colors duration-300 ${stat.glow}`}
           >
-            <div className={`absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-white/5 to-transparent rounded-bl-full pointer-events-none opacity-50`} />
+            <div className={`absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-white/5 to-transparent pointer-events-none opacity-50`} />
             <stat.icon className={`w-6 h-6 ${stat.color} group-hover:scale-110 transition-transform duration-300`} />
             <div className="text-center">
               <div className={`font-mono text-2xl font-bold ${stat.color} text-shadow-glow tracking-wider`}>
@@ -195,7 +231,7 @@ export const Dashboard: React.FC = () => {
         {/* System Vitals */}
         <motion.div 
           initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }}
-          className="bg-black/60 border border-cyan-900/50 rounded-2xl p-6 backdrop-blur-xl"
+          className="relative hud-glass corner-brackets p-6"
         >
           <h2 className="font-display uppercase tracking-[0.2em] text-cyan-500 mb-6 flex items-center gap-2">
             <Activity className="w-5 h-5" /> System Vitals
@@ -208,27 +244,47 @@ export const Dashboard: React.FC = () => {
                 <span className="text-cyan-400">{Math.round(dailyCalories)} KCAL</span>
               </div>
               <div className="h-1.5 bg-black rounded-full overflow-hidden border border-cyan-900/30">
-                <div className="h-full bg-cyan-500 shadow-[0_0_10px_#00d4ff]" style={{ width: `${Math.min(100, (dailyCalories / 2500) * 100)}%` }} />
+                <div className="h-full bg-cyan-500 shadow-[0_0_10px_#00d4ff] transition-all" style={{ width: `${Math.min(100, (dailyCalories / 2500) * 100)}%` }} />
               </div>
             </div>
 
             <div>
               <div className="flex justify-between text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-2">
-                <span>Combat Readiness</span>
-                <span className="text-red-400">OPTIMAL</span>
+                <span>Dopamine Balance</span>
+                <span className="text-yellow-400">{Math.round(monarchData?.monarch?.attributes?.dopamineBalance || 0)}%</span>
+              </div>
+              <div className="h-1.5 bg-black rounded-full overflow-hidden border border-yellow-900/30">
+                <div className="h-full bg-yellow-500 shadow-[0_0_10px_#eab308] transition-all" style={{ width: `${monarchData?.monarch?.attributes?.dopamineBalance || 0}%` }} />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-2">
+                <span>Physical Power</span>
+                <span className="text-red-400">{Math.round(monarchData?.monarch?.balance?.body || 0)} / 100</span>
               </div>
               <div className="h-1.5 bg-black rounded-full overflow-hidden border border-red-900/30">
-                <div className="h-full bg-red-500 shadow-[0_0_10px_#ef4444] w-full" />
+                <div className="h-full bg-red-500 shadow-[0_0_10px_#ef4444] transition-all" style={{ width: `${monarchData?.monarch?.balance?.body || 0}%` }} />
               </div>
             </div>
 
             <div>
               <div className="flex justify-between text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-2">
-                <span>Neural Capacity</span>
-                <span className="text-purple-400">{skills.length} SKILLS</span>
+                <span>Mental Power</span>
+                <span className="text-purple-400">{Math.round(monarchData?.monarch?.balance?.mind || 0)} / 100</span>
               </div>
               <div className="h-1.5 bg-black rounded-full overflow-hidden border border-purple-900/30">
-                <div className="h-full bg-purple-500 shadow-[0_0_10px_#c084fc]" style={{ width: `${Math.min(100, skills.length * 10)}%` }} />
+                <div className="h-full bg-purple-500 shadow-[0_0_10px_#c084fc] transition-all" style={{ width: `${monarchData?.monarch?.balance?.mind || 0}%` }} />
+              </div>
+            </div>
+            
+            <div>
+              <div className="flex justify-between text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-2">
+                <span>Recovery</span>
+                <span className="text-green-400">{Math.round(monarchData?.monarch?.balance?.recovery || 0)} / 100</span>
+              </div>
+              <div className="h-1.5 bg-black rounded-full overflow-hidden border border-green-900/30">
+                <div className="h-full bg-green-500 shadow-[0_0_10px_#22c55e] transition-all" style={{ width: `${monarchData?.monarch?.balance?.recovery || 0}%` }} />
               </div>
             </div>
           </div>
@@ -251,9 +307,9 @@ export const Dashboard: React.FC = () => {
       {boss && (
         <motion.div 
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
-          className="bg-black/80 border border-red-900/50 rounded-2xl p-6 backdrop-blur-xl relative overflow-hidden group shadow-[0_0_30px_rgba(220,38,38,0.15)] mt-6"
+          className="relative hud-glass corner-brackets border-[var(--color-system-red)] p-6 mt-6 shadow-boss group"
         >
-          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-red-500/0 via-red-500/50 to-red-500/0 opacity-50" />
+          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-red-500/0 via-red-500/80 to-red-500/0 opacity-70" />
           <h2 className="font-display uppercase tracking-[0.2em] text-red-500 mb-6 flex items-center gap-2 text-shadow-glow">
             <Target className="w-5 h-5" /> Weekly Boss Fight
           </h2>
@@ -297,10 +353,11 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
         <div className="lg:col-span-1 space-y-6">
+          <FocusTimerWidget />
           <RecentAchievements achievements={unlockedAchievements} />
           <PerfectDayWidget 
             missionsCompleted={allQuestsCompleted} 
-            recoveryPassed={true /* We need recovery score here, mock or fetch */} 
+            recoveryPassed={(monarchData?.monarch?.balance?.recovery || 0) >= 40} 
             hasClaimed={hasClaimedPerfectDay} 
           />
         </div>

@@ -19,11 +19,24 @@ export const useAcademics = () => {
     },
   });
 
+  const completeTaskMutation = useMutation({
+    mutationFn: ({ taskId, taskType }: { taskId: string; taskType: 'assignment' | 'exam' }) => 
+      academicApi.completeTask(taskId, taskType),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['academicProfile'] });
+      queryClient.invalidateQueries({ queryKey: ['progression'] });
+      queryClient.invalidateQueries({ queryKey: ['monarch'] });
+      queryClient.invalidateQueries({ queryKey: ['missions'] });
+    },
+  });
+
   return {
     profile: profileQuery.data?.profile,
     isLoading: profileQuery.isLoading,
     error: profileQuery.error,
     updateProfile: updateProfileMutation.mutate,
     isUpdating: updateProfileMutation.isPending,
+    completeTask: completeTaskMutation.mutateAsync,
+    isCompletingTask: completeTaskMutation.isPending,
   };
 };

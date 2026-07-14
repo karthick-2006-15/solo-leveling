@@ -207,9 +207,9 @@ export const Nutrition: React.FC = () => {
   const logsForTab = logs.filter((l: any) => l.mealType === activeTab);
 
   return (
-    <div className="relative min-h-screen text-white font-mono">
+    <div className="relative min-h-screen text-white font-mono overflow-x-hidden">
       <HunterBackground />
-      <div className="space-y-6 pb-20 md:pb-8 relative z-10">
+      <div className="space-y-4 md:space-y-6 pb-20 md:pb-8 relative z-10 px-3 md:px-0">
       <AchievementToast toasts={toasts} removeToast={removeToast} />
       <LevelUpModal 
         isOpen={levelUpData.isOpen} 
@@ -219,7 +219,7 @@ export const Nutrition: React.FC = () => {
         rankChanged={levelUpData.rankChanged}
       />
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 md:gap-0">
         <PageHeader 
           title="Nutrition Command" 
           subtitle="Fuel tracking and metabolic analysis." 
@@ -265,12 +265,12 @@ export const Nutrition: React.FC = () => {
         {/* Middle Col: Food Logging */}
         <div className="lg:col-span-2 space-y-6">
           <SystemWindow title="Intake Logging">
-            <div className="flex bg-[rgba(0,0,0,0.4)] rounded-[2px] p-1 mb-6 border border-[rgba(255,255,255,0.05)]">
+            <div className="grid grid-cols-4 md:flex md:flex-nowrap bg-[rgba(0,0,0,0.4)] rounded-[2px] p-1 mb-4 md:mb-6 border border-[rgba(255,255,255,0.05)] gap-1 md:gap-0">
               {['breakfast', 'lunch', 'dinner', 'snack'].map(tab => (
                 <button 
                   key={tab}
                   onClick={() => setActiveTab(tab as MealType)}
-                  className={`flex-1 py-2.5 rounded-[2px] text-[11px] font-mono font-bold tracking-widest uppercase transition-colors ${
+                  className={`flex-1 py-2.5 min-h-[44px] rounded-[2px] text-[10px] sm:text-[11px] font-mono font-bold tracking-widest uppercase transition-colors ${
                     activeTab === tab 
                       ? 'bg-[rgba(0,212,255,0.1)] text-[var(--color-system-blue)] border border-[rgba(0,212,255,0.3)]' 
                       : 'text-[var(--color-system-text-dim)] hover:text-white border border-transparent'
@@ -281,7 +281,7 @@ export const Nutrition: React.FC = () => {
               ))}
             </div>
 
-            <div className="flex gap-4 mb-6 border-b border-[rgba(255,255,255,0.1)] pb-4">
+            <div className="flex flex-col md:flex-row gap-2 md:gap-4 mb-4 md:mb-6 border-b border-[rgba(255,255,255,0.1)] pb-4">
               <button 
                 onClick={() => setLogMode('search')}
                 className={`flex items-center gap-2 text-[12px] font-mono tracking-widest uppercase pb-2 border-b-2 transition-colors ${logMode === 'search' ? 'border-[var(--color-system-blue)] text-[var(--color-system-blue)]' : 'border-transparent text-[var(--color-system-text-dim)] hover:text-white'}`}
@@ -341,45 +341,45 @@ export const Nutrition: React.FC = () => {
                 )}
               </div>
             ) : (
-              <form onSubmit={handleManualLog} className="space-y-4 mb-8 bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-[2px] p-6">
+              <form onSubmit={handleManualLog} className="space-y-4 mb-6 md:mb-8 bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-[2px] p-4 md:p-6">
                 <div>
                   <label className="text-[10px] font-mono tracking-widest text-[var(--color-system-text-dim)] uppercase">Food Designation</label>
                   <input 
                     required 
                     value={manualForm.name}
                     onChange={e => setManualForm({...manualForm, name: e.target.value})}
-                    className="w-full bg-[rgba(0,0,0,0.5)] border border-[rgba(255,255,255,0.1)] focus:border-[var(--color-system-blue)] text-white p-3 mt-1 text-[14px] font-display uppercase tracking-wide outline-none transition-colors"
+                    className="w-full bg-[rgba(0,0,0,0.5)] border border-[rgba(255,255,255,0.1)] focus:border-[var(--color-system-blue)] text-white p-3 mt-1 text-base font-display uppercase tracking-wide outline-none transition-colors"
                     placeholder="E.G. CUSTOM PROTEIN SHAKE"
                   />
                 </div>
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                   <div>
                     <label className="text-[9px] font-mono tracking-widest text-[var(--color-system-text-dim)] uppercase">Calories</label>
-                    <input type="number" required min="1" value={manualForm.calories || ''} onChange={e => setManualForm({...manualForm, calories: Number(e.target.value)})} className="w-full bg-[rgba(0,0,0,0.5)] border border-[rgba(255,255,255,0.1)] focus:border-[var(--color-system-blue)] text-white p-2 mt-1 text-[12px] font-mono text-center outline-none transition-colors" />
+                    <input type="number" required min="1" value={manualForm.calories || ''} onChange={e => setManualForm({...manualForm, calories: Number(e.target.value)})} className="w-full bg-[rgba(0,0,0,0.5)] border border-[rgba(255,255,255,0.1)] focus:border-[var(--color-system-blue)] text-white p-2 mt-1 text-base font-mono text-center outline-none transition-colors" />
                   </div>
                   <div>
                     <label className="text-[9px] font-mono tracking-widest text-[var(--color-system-text-dim)] uppercase">Protein (g)</label>
-                    <input type="number" min="0" value={manualForm.protein || ''} onChange={e => setManualForm({...manualForm, protein: Number(e.target.value)})} className="w-full bg-[rgba(0,0,0,0.5)] border border-[rgba(255,255,255,0.1)] focus:border-[var(--color-system-blue)] text-white p-2 mt-1 text-[12px] font-mono text-center outline-none transition-colors" />
+                    <input type="number" min="0" value={manualForm.protein || ''} onChange={e => setManualForm({...manualForm, protein: Number(e.target.value)})} className="w-full bg-[rgba(0,0,0,0.5)] border border-[rgba(255,255,255,0.1)] focus:border-[var(--color-system-blue)] text-white p-2 mt-1 text-base font-mono text-center outline-none transition-colors" />
                   </div>
                   <div>
                     <label className="text-[9px] font-mono tracking-widest text-[var(--color-system-text-dim)] uppercase">Carbs (g)</label>
-                    <input type="number" min="0" value={manualForm.carbs || ''} onChange={e => setManualForm({...manualForm, carbs: Number(e.target.value)})} className="w-full bg-[rgba(0,0,0,0.5)] border border-[rgba(255,255,255,0.1)] focus:border-[var(--color-system-blue)] text-white p-2 mt-1 text-[12px] font-mono text-center outline-none transition-colors" />
+                    <input type="number" min="0" value={manualForm.carbs || ''} onChange={e => setManualForm({...manualForm, carbs: Number(e.target.value)})} className="w-full bg-[rgba(0,0,0,0.5)] border border-[rgba(255,255,255,0.1)] focus:border-[var(--color-system-blue)] text-white p-2 mt-1 text-base font-mono text-center outline-none transition-colors" />
                   </div>
                   <div>
                     <label className="text-[9px] font-mono tracking-widest text-[var(--color-system-text-dim)] uppercase">Fat (g)</label>
-                    <input type="number" min="0" value={manualForm.fat || ''} onChange={e => setManualForm({...manualForm, fat: Number(e.target.value)})} className="w-full bg-[rgba(0,0,0,0.5)] border border-[rgba(255,255,255,0.1)] focus:border-[var(--color-system-blue)] text-white p-2 mt-1 text-[12px] font-mono text-center outline-none transition-colors" />
+                    <input type="number" min="0" value={manualForm.fat || ''} onChange={e => setManualForm({...manualForm, fat: Number(e.target.value)})} className="w-full bg-[rgba(0,0,0,0.5)] border border-[rgba(255,255,255,0.1)] focus:border-[var(--color-system-blue)] text-white p-2 mt-1 text-base font-mono text-center outline-none transition-colors" />
                   </div>
                   <div>
                     <label className="text-[9px] font-mono tracking-widest text-[var(--color-system-text-dim)] uppercase">Fiber (g)</label>
-                    <input type="number" min="0" value={manualForm.fiber || ''} onChange={e => setManualForm({...manualForm, fiber: Number(e.target.value)})} className="w-full bg-[rgba(0,0,0,0.5)] border border-[rgba(255,255,255,0.1)] focus:border-[var(--color-system-blue)] text-white p-2 mt-1 text-[12px] font-mono text-center outline-none transition-colors" />
+                    <input type="number" min="0" value={manualForm.fiber || ''} onChange={e => setManualForm({...manualForm, fiber: Number(e.target.value)})} className="w-full bg-[rgba(0,0,0,0.5)] border border-[rgba(255,255,255,0.1)] focus:border-[var(--color-system-blue)] text-white p-2 mt-1 text-base font-mono text-center outline-none transition-colors" />
                   </div>
                   <div>
                     <label className="text-[9px] font-mono tracking-widest text-[var(--color-system-text-dim)] uppercase">Sugar (g)</label>
-                    <input type="number" min="0" value={manualForm.sugar || ''} onChange={e => setManualForm({...manualForm, sugar: Number(e.target.value)})} className="w-full bg-[rgba(0,0,0,0.5)] border border-[rgba(255,255,255,0.1)] focus:border-[var(--color-system-blue)] text-white p-2 mt-1 text-[12px] font-mono text-center outline-none transition-colors" />
+                    <input type="number" min="0" value={manualForm.sugar || ''} onChange={e => setManualForm({...manualForm, sugar: Number(e.target.value)})} className="w-full bg-[rgba(0,0,0,0.5)] border border-[rgba(255,255,255,0.1)] focus:border-[var(--color-system-blue)] text-white p-2 mt-1 text-base font-mono text-center outline-none transition-colors" />
                   </div>
                   <div>
                     <label className="text-[9px] font-mono tracking-widest text-[var(--color-system-text-dim)] uppercase">Sodium (mg)</label>
-                    <input type="number" min="0" value={(manualForm as any).sodium || ''} onChange={e => setManualForm({...manualForm, sodium: Number(e.target.value)} as any)} className="w-full bg-[rgba(0,0,0,0.5)] border border-[rgba(255,255,255,0.1)] focus:border-[var(--color-system-blue)] text-white p-2 mt-1 text-[12px] font-mono text-center outline-none transition-colors" />
+                    <input type="number" min="0" value={(manualForm as any).sodium || ''} onChange={e => setManualForm({...manualForm, sodium: Number(e.target.value)} as any)} className="w-full bg-[rgba(0,0,0,0.5)] border border-[rgba(255,255,255,0.1)] focus:border-[var(--color-system-blue)] text-white p-2 mt-1 text-base font-mono text-center outline-none transition-colors" />
                   </div>
                 </div>
                 <PrimaryButton type="submit" fullWidth className="mt-4 !py-3">LOG MANUAL ENTRY</PrimaryButton>
@@ -392,7 +392,7 @@ export const Nutrition: React.FC = () => {
                 <Utensils size={14} /> Logged {activeTab}
               </h3>
               {logsForTab.map((log: any) => (
-                <div key={log._id} className="flex justify-between items-center p-4 bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-[2px] hover:bg-[rgba(255,255,255,0.05)] transition-colors group">
+                <div key={log._id} className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 md:gap-4 p-3 md:p-4 bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-[2px] hover:bg-[rgba(255,255,255,0.05)] transition-colors group">
                   <div>
                     <div className="font-display font-bold text-[14px] text-white uppercase tracking-wider mb-1">{log.rawDescription}</div>
                     <div className="text-[10px] font-mono text-[var(--color-system-text-dim)] uppercase tracking-widest">
@@ -401,7 +401,7 @@ export const Nutrition: React.FC = () => {
                   </div>
                   <button 
                     onClick={() => deleteLog(log._id)}
-                    className="p-2 text-[var(--color-system-text-dim)] opacity-0 group-hover:opacity-100 hover:text-red-500 transition-all"
+                    className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-[var(--color-system-text-dim)] opacity-100 md:opacity-0 group-hover:opacity-100 hover:text-red-500 transition-all self-end md:self-auto"
                   >
                     <Trash2 size={18} />
                   </button>
@@ -411,7 +411,7 @@ export const Nutrition: React.FC = () => {
             </div>
           </SystemWindow>
 
-          <SystemWindow title="Energy Trend" className="h-[300px]" innerClassName="p-4 pt-6 h-full flex flex-col bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyOCIgaGVpZ2h0PSI0OSIgdmlld0JveD0iMCAwIDI4IDQ5Ij48cGF0aCBmaWxsPSIjMDBkNGZmIiBkPSJNMTMuOTkgMTEuMjVMNSAyNi43OXYtMTUuNTRMMTMuOTkgNC4ydjcuMDV6TTI4IDI2Ljc5TTEzLjk5IDM3Ljc1TDIzIDEyLjJWMjcuNzRsLTkuMDEgMTB6Ii8+PC9zdmc+')] bg-[length:30px_30px] shadow-[inset_0_0_50px_rgba(0,0,0,0.9)] relative overflow-hidden">
+          <SystemWindow title="Energy Trend" className="h-[250px] md:h-[300px] min-h-[200px]" innerClassName="p-3 md:p-4 pt-4 md:pt-6 h-full flex flex-col bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyOCIgaGVpZ2h0PSI0OSIgdmlld0JveD0iMCAwIDI4IDQ5Ij48cGF0aCBmaWxsPSIjMDBkNGZmIiBkPSJNMTMuOTkgMTEuMjVMNSAyNi43OXYtMTUuNTRMMTMuOTkgNC4ydjcuMDV6TTI4IDI2Ljc5TTEzLjk5IDM3Ljc1TDIzIDEyLjJWMjcuNzRsLTkuMDEgMTB6Ii8+PC9zdmc+')] bg-[length:30px_30px] shadow-[inset_0_0_50px_rgba(0,0,0,0.9)] relative overflow-hidden">
             <div className="absolute inset-0 bg-black/60 pointer-events-none" />
             <div className="flex-1 min-h-0 w-full relative z-10">
               {graphData.length > 0 ? (

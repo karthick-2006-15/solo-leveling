@@ -1,19 +1,11 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchWithAuth } from '../../api/fetchHelper';
-import { Lock, Unlock, Zap, AlertTriangle, Star, CheckCircle, ShieldAlert } from 'lucide-react';
+import { Lock, Unlock, Zap, AlertTriangle, Star, CheckCircle, ShieldAlert, Ghost, Link } from 'lucide-react';
 import { devAwardXP } from '../../api/progressionApi';
-
-interface Quest {
-  _id: string;
-  title: string;
-  description: string;
-  status: 'locked' | 'available' | 'completed' | 'failed';
-  type: 'daily' | 'hidden' | 'emergency' | 'bonus' | 'boss';
-  xpReward: number;
-  dependencies: string[];
-}
+import { useMissions } from '../../hooks/useMissions';
+import { MissionHistory } from './MissionHistory';
 
 export const MissionBoard: React.FC = () => {
   const queryClient = useQueryClient();
@@ -27,25 +19,18 @@ export const MissionBoard: React.FC = () => {
   const [checkInData, setCheckInData] = useState({ sleepQuality: 80, energyLevel: 80, stressLevel: 20 });
   const [isCheckingIn, setIsCheckingIn] = useState(false);
 
-  const { data: quests = [], isLoading } = useQuery<Quest[]>({
-    queryKey: ['adaptiveQuests'],
-    queryFn: async () => {
-      const res = await fetchWithAuth('/api/missions/quests/today');
-      const data = await res.json();
-      return data.quests || [];
-    },
-    enabled: !needsCheckIn
-  });
+  const { quests, questsLoading: isLoading, shadows, resurrectShadow, isResurrecting } = useMissions();
 
   const completeMutation = useMutation({
-    mutationFn: async (quest: Quest) => {
+    mutationFn: async (quest: any) => {
       const res = await fetchWithAuth(`/api/missions/${quest._id}/complete`, { method: 'POST' });
       await res.json();
       await devAwardXP(quest.title, quest.xpReward); // Actually award XP to user
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['adaptiveQuests'] });
+      queryClient.invalidateQueries({ queryKey: ['missions'] });
       queryClient.invalidateQueries({ queryKey: ['progression'] });
+      queryClient.invalidateQueries({ queryKey: ['monarch'] });
     }
   });
 
@@ -68,7 +53,7 @@ export const MissionBoard: React.FC = () => {
 
   if (needsCheckIn) {
     return (
-      <div className="bg-black/60 border border-cyan-900/50 rounded-2xl p-6 backdrop-blur-xl mb-8 relative overflow-hidden">
+      <div className="hud-glass corner-brackets p-6 mb-8 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,212,255,0.1)_0%,rgba(0,0,0,0)_70%)] pointer-events-none" />
         <h2 className="font-display uppercase tracking-[0.2em] text-cyan-500 flex items-center gap-2 mb-4">
           <ShieldAlert className="w-5 h-5 text-yellow-400" /> Daily System Diagnostic
@@ -97,14 +82,14 @@ export const MissionBoard: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-black/60 border border-cyan-900/50 rounded-2xl p-6 backdrop-blur-xl mb-8 animate-pulse text-center">
+      <div className="hud-glass corner-brackets p-6 mb-8 animate-pulse text-center">
         <h2 className="font-mono text-cyan-500 uppercase tracking-widest">Generating Adaptive Missions...</h2>
       </div>
     );
   }
 
   return (
-    <div className="bg-black/60 border border-cyan-900/50 rounded-2xl p-6 backdrop-blur-xl mb-8 relative">
+    <div className="hud-glass corner-brackets p-6 mb-8 relative">
       <div className="flex justify-between items-center mb-6">
         <h2 className="font-display uppercase tracking-[0.2em] text-cyan-500 flex items-center gap-2">
           <Zap className="w-5 h-5 text-cyan-400" /> Active Directives
@@ -170,6 +155,11 @@ export const MissionBoard: React.FC = () => {
                         {quest.type}
                       </span>
                     )}
+                    {quest.unlocks && quest.unlocks.length > 0 && (
+                      <span title="Chain Mission: Unlocks further missions" className="text-cyan-400">
+                        <Link className="w-4 h-4 inline" />
+                      </span>
+                    )}
                   </div>
                   <p className="font-sans text-sm text-gray-400">{quest.description}</p>
                 </div>
@@ -199,6 +189,64 @@ export const MissionBoard: React.FC = () => {
           </AnimatePresence>
         </div>
       )}
+
+      {/* SHADOW ARMY SECTION */}
+      {shadows && shadows.length > 0 && (
+        <div className="mt-8 pt-8 border-t border-purple-900/30">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="font-display uppercase tracking-[0.2em] text-purple-500 flex items-center gap-2">
+              <Ghost className="w-5 h-5" /> Shadow Army
+            </h2>
+            <span className="font-mono text-[10px] text-gray-500 uppercase tracking-widest text-right">
+              Fallen Quests from Yesterday.<br/>Resurrect them for partial XP.
+            </span>
+          </div>
+
+          <div className="space-y-4">
+            <AnimatePresence>
+              {shadows.map(shadow => (
+                <motion.div 
+                  key={shadow._id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  className="p-4 rounded-xl border border-purple-900/50 bg-purple-950/20 relative overflow-hidden flex flex-col md:flex-row items-center gap-4"
+                >
+                  <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay pointer-events-none" />
+                  
+                  <div className="flex-shrink-0">
+                    <Ghost className="w-8 h-8 text-purple-500 animate-pulse" />
+                  </div>
+
+                  <div className="flex-1 text-center md:text-left relative z-10">
+                    <h3 className="font-display tracking-wider uppercase text-lg text-purple-400">
+                      {shadow.title}
+                    </h3>
+                    <p className="font-sans text-sm text-gray-400 opacity-80">{shadow.description}</p>
+                  </div>
+
+                  <div className="flex flex-col items-center gap-2 relative z-10">
+                    <div className="font-mono text-xs text-purple-300 bg-purple-950/50 px-3 py-1 rounded border border-purple-900/30">
+                      ~{Math.floor(shadow.xpReward / 2)} XP
+                    </div>
+                    <button 
+                      onClick={() => resurrectShadow(shadow._id)}
+                      disabled={isResurrecting}
+                      className="px-6 py-2 bg-purple-500/20 hover:bg-purple-500/40 border border-purple-500 text-purple-300 font-mono text-xs uppercase tracking-widest font-bold rounded transition-colors disabled:opacity-50"
+                    >
+                      Arise
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+        </div>
+      )}
+
+      {/* MISSION HISTORY SECTION */}
+      <MissionHistory />
+
     </div>
   );
 };

@@ -207,14 +207,14 @@ export const Habits: React.FC = () => {
             <label className="block text-[10px] font-mono tracking-widest text-cyan-600 mb-2 uppercase">Mission Designation</label>
             <input 
               type="text" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})}
-              className="w-full bg-black/50 border border-cyan-900 rounded p-3 text-white font-display uppercase tracking-wider focus:border-cyan-500 focus:outline-none transition-colors"
+              className="w-full bg-black/50 border border-cyan-900 rounded p-3 text-white font-display uppercase tracking-wider text-base md:text-sm focus:border-cyan-500 focus:outline-none transition-colors"
               placeholder="E.g. Morning Meditation"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-[10px] font-mono tracking-widest text-cyan-600 mb-2 uppercase">XP Reward</label>
-              <input type="number" value={formData.xpValue} onChange={e => setFormData({...formData, xpValue: Number(e.target.value)})} className="w-full bg-black/50 border border-cyan-900 rounded p-3 text-white font-mono text-sm focus:border-cyan-500 focus:outline-none" />
+              <input type="number" value={formData.xpValue} onChange={e => setFormData({...formData, xpValue: Number(e.target.value)})} className="w-full bg-black/50 border border-cyan-900 rounded p-3 text-white font-mono text-base md:text-sm focus:border-cyan-500 focus:outline-none" />
             </div>
           </div>
           

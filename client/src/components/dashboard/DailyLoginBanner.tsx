@@ -10,13 +10,19 @@ export const DailyLoginBanner: React.FC = () => {
 
   let isVisible = false;
   if (stats && !isDismissed) {
-    const lastClaim = stats.lastClaimDate ? new Date(stats.lastClaimDate) : null;
-    const today = new Date();
+    const timezoneOffset = new Date().getTimezoneOffset();
+    const now = new Date();
+    const localTime = now.getTime() - (timezoneOffset * 60000);
+    const today = new Date(localTime);
     today.setUTCHours(0, 0, 0, 0);
 
     let claimable = true;
-    if (lastClaim) {
+    if (stats.lastClaimDate) {
+      const last = new Date(stats.lastClaimDate);
+      const lastLocalTime = last.getTime() - (timezoneOffset * 60000);
+      const lastClaim = new Date(lastLocalTime);
       lastClaim.setUTCHours(0, 0, 0, 0);
+      
       if (today.getTime() === lastClaim.getTime()) {
         claimable = false;
       }

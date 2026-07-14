@@ -6,10 +6,15 @@ export interface QuestInstance {
   title: string;
   description: string;
   targetValue?: number;
+  dependencies?: string[];
+  unlocks?: string[];
   currentProgress: number;
   completed: boolean;
+  status: 'locked' | 'available' | 'completed' | 'failed' | 'abandoned';
+  type: 'daily' | 'hidden' | 'emergency' | 'bonus' | 'boss';
   xpReward: number;
   coinReward: number;
+  isShadow?: boolean;
 }
 
 export interface BossRequirement {
@@ -55,4 +60,19 @@ export const fetchBadges = async (): Promise<Badge[]> => {
   const res = await fetchWithAuth(`${API_BASE}/badges`);
   const data = await res.json();
   return data.badges;
+};
+
+export const fetchShadows = async (): Promise<QuestInstance[]> => {
+  const res = await fetchWithAuth(`${API_BASE}/shadows`);
+  const data = await res.json();
+  return data.shadows;
+};
+
+export const resurrectShadow = async (shadowId: string): Promise<QuestInstance> => {
+  const res = await fetchWithAuth(`${API_BASE}/shadows/resurrect`, {
+    method: 'POST',
+    body: JSON.stringify({ shadowId })
+  });
+  const data = await res.json();
+  return data.quest;
 };

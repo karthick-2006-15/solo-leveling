@@ -23,6 +23,22 @@ export const generateDailyMissions = async (userId: string, date: Date = new Dat
     return existingQuests;
   }
 
+  // 0. Process Yesterday's Unfinished Quests -> Shadow Quests
+  const yesterday = new Date(startOfDay);
+  yesterday.setDate(yesterday.getDate() - 1);
+  
+  const unfinishedQuests = await QuestInstance.find({ 
+    userId, 
+    date: yesterday,
+    status: { $in: ['active', 'locked'] }
+  });
+
+  for (const uq of unfinishedQuests) {
+    uq.status = 'failed';
+    uq.isShadow = true;
+    await uq.save();
+  }
+
   // 1. Fetch active templates
   const templates = await MissionTemplate.find({ userId, active: true });
   
@@ -125,20 +141,44 @@ export const generateDailyMissions = async (userId: string, date: Date = new Dat
   for (const instance of generatedInstances) {
     if (!instance.templateId) continue;
     const t = templates.find(temp => temp._id.toString() === instance.templateId);
-    if (t && t.prerequisites && t.prerequisites.length > 0) {
-      const depIds: mongoose.Types.ObjectId[] = [];
-      for (const preReqId of t.prerequisites.map((dep: mongoose.Types.ObjectId) => dep.toString())) {
-        const mappedInstId = templateToInstanceMap.get(preReqId.toString());
-        if (mappedInstId) {
-          depIds.push(mappedInstId);
+    if (t) {
+      let needsSave = false;
+      
+      // Handle prerequisites -> dependencies
+      if (t.prerequisites && t.prerequisites.length > 0) {
+        const depIds: mongoose.Types.ObjectId[] = [];
+        for (const preReqId of t.prerequisites.map((dep: mongoose.Types.ObjectId) => dep.toString())) {
+          const mappedInstId = templateToInstanceMap.get(preReqId.toString());
+          if (mappedInstId) {
+            depIds.push(mappedInstId);
+          }
+        }
+        if (depIds.length > 0) {
+          instance.dependencies = depIds;
+          needsSave = true;
+        } else {
+          // Prerequisites aren't active today, so unlock it immediately
+          instance.status = 'available';
+          needsSave = true;
         }
       }
-      if (depIds.length > 0) {
-        instance.dependencies = depIds;
-        await instance.save();
-      } else {
-        // Prerequisites aren't active today, so unlock it immediately
-        instance.status = 'available';
+
+      // Handle unlocks
+      if (t.unlocks && t.unlocks.length > 0) {
+        const unlockIds: mongoose.Types.ObjectId[] = [];
+        for (const uId of t.unlocks.map((u: mongoose.Types.ObjectId) => u.toString())) {
+          const mappedInstId = templateToInstanceMap.get(uId.toString());
+          if (mappedInstId) {
+            unlockIds.push(mappedInstId);
+          }
+        }
+        if (unlockIds.length > 0) {
+          instance.unlocks = unlockIds;
+          needsSave = true;
+        }
+      }
+
+      if (needsSave) {
         await instance.save();
       }
     }

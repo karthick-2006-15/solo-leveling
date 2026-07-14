@@ -1,34 +1,39 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
 
 @theme {
-  --color-system-black: #05070A;
-  --color-system-dark: #0A0F1A;
-  --color-system-darker: #04070D;
-  --color-system-blue: #00E5FF;
+  --color-system-black: #05070B;
+  --color-system-dark: #0B111B;
+  --color-system-darker: #020305;
+  --color-system-blue: #00E5FF; /* Electric Blue Highlight */
   --color-system-blue-dim: #00A6CC;
-  --color-system-purple: #9D4EDD;
+  --color-system-cyan: #00FFFF; /* Neon Cyan Border */
+  --color-system-purple: #9D4EDD; /* Secondary Accent */
   --color-system-violet: #7B2CBF;
-  --color-system-gold: #FFB703;
-  --color-system-red: #FF0054;
-  --color-system-green: #00F5D4;
+  --color-system-gold: #FFB703; /* XP */
+  --color-system-red: #FF0054; /* Danger */
+  --color-system-orange: #FF7B00; /* Warning */
+  --color-system-green: #00F5D4; /* Success */
+  --color-system-cards: #101826;
+  
   --color-system-text: #F8F9FA;
   --color-system-text-dim: #ADB5BD;
-  --color-system-border: rgba(0, 229, 255, 0.2);
-  --color-system-glow: rgba(0, 229, 255, 0.15);
+  --color-system-border: rgba(0, 255, 255, 0.4);
+  --color-system-glow: rgba(0, 229, 255, 0.2);
 
   --font-display: 'Rajdhani', sans-serif;
   --font-body: 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  --shadow-system: 0 0 20px rgba(0, 229, 255, 0.15);
-  --shadow-system-lg: 0 0 40px rgba(0, 229, 255, 0.25);
-  --shadow-purple: 0 0 20px rgba(157, 78, 221, 0.25);
-  --shadow-gold: 0 0 20px rgba(255, 183, 3, 0.30);
-  --shadow-boss: 0 0 30px rgba(255, 0, 84, 0.30);
-  --shadow-glow-blue: 0 0 12px rgba(0, 229, 255, 0.90);
-  --shadow-glow-gold: 0 0 12px rgba(255, 183, 3, 0.90);
-  --shadow-glow-red: 0 0 12px rgba(255, 0, 84, 0.90);
-  --shadow-inner-glow: inset 0 0 40px rgba(0, 229, 255, 0.05);
+  --shadow-system: 0 0 20px rgba(0, 255, 255, 0.25);
+  --shadow-system-lg: 0 0 40px rgba(0, 255, 255, 0.35);
+  --shadow-purple: 0 0 20px rgba(157, 78, 221, 0.35);
+  --shadow-gold: 0 0 20px rgba(255, 183, 3, 0.40);
+  --shadow-boss: 0 0 30px rgba(255, 0, 84, 0.40);
+  --shadow-glow-blue: 0 0 15px rgba(0, 229, 255, 1);
+  --shadow-glow-cyan: 0 0 15px rgba(0, 255, 255, 1);
+  --shadow-glow-gold: 0 0 15px rgba(255, 183, 3, 1);
+  --shadow-glow-red: 0 0 15px rgba(255, 0, 84, 1);
+  --shadow-inner-glow: inset 0 0 50px rgba(0, 255, 255, 0.1);
 
   --animate-pulse-slow: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-float: float 6s ease-in-out infinite;
@@ -36,14 +41,18 @@
   --animate-shimmer: shimmer 1.5s infinite;
   --animate-scan: scan 4s linear infinite;
   --animate-scan-vertical: scan-vertical 4s linear infinite;
+  --animate-glitch: glitch 2s linear infinite;
 }
 
 @layer base {
   body {
     background: var(--color-system-black);
     background-image: 
-      radial-gradient(circle at 15% 50%, rgba(0, 229, 255, 0.06), transparent 25%),
-      radial-gradient(circle at 85% 30%, rgba(157, 78, 221, 0.06), transparent 25%);
+      radial-gradient(circle at 15% 50%, rgba(0, 229, 255, 0.08), transparent 25%),
+      radial-gradient(circle at 85% 30%, rgba(157, 78, 221, 0.08), transparent 25%),
+      linear-gradient(rgba(0, 229, 255, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 229, 255, 0.02) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 30px 30px, 30px 30px;
     background-attachment: fixed;
     color: var(--color-system-text);
     font-family: var(--font-body);
@@ -66,6 +75,32 @@
   }
   ::-webkit-scrollbar-thumb:hover {
     background: rgba(0, 229, 255, 0.5);
+  }
+
+  body.theme-corrupted {
+    --color-system-blue: var(--color-system-red);
+    --color-system-blue-dim: #D90047;
+    --shadow-system: 0 0 20px rgba(255, 0, 84, 0.2);
+    --shadow-system-lg: 0 0 40px rgba(255, 0, 84, 0.25);
+    --shadow-glow-blue: 0 0 12px rgba(255, 0, 84, 0.90);
+    --shadow-inner-glow: inset 0 0 40px rgba(255, 0, 84, 0.05);
+    --color-cyan-400: #f87171;
+    --color-cyan-500: #ef4444;
+    --color-cyan-900: #7f1d1d;
+    filter: saturate(1.2) contrast(1.1);
+  }
+
+  body.theme-monarch {
+    --color-system-blue: var(--color-system-green);
+    --color-system-blue-dim: #00CBAF;
+    --shadow-system: 0 0 20px rgba(0, 245, 212, 0.2);
+    --shadow-system-lg: 0 0 40px rgba(0, 245, 212, 0.25);
+    --shadow-glow-blue: 0 0 12px rgba(0, 245, 212, 0.90);
+    --shadow-inner-glow: inset 0 0 40px rgba(0, 245, 212, 0.05);
+    --color-cyan-400: #2dd4bf;
+    --color-cyan-500: #14b8a6;
+    --color-cyan-900: #134e4a;
+    filter: brightness(1.1);
   }
 }
 
@@ -111,11 +146,54 @@
   }
 
   .hud-glass {
-    background: rgba(10, 15, 26, 0.6);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: var(--color-system-cards);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--color-system-border);
     box-shadow: var(--shadow-system);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .hud-glass::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .corner-brackets {
+    position: relative;
+  }
+  .corner-brackets::before, .corner-brackets::after {
+    content: '';
+    position: absolute;
+    width: 15px; height: 15px;
+    border: 2px solid var(--color-system-cyan);
+    pointer-events: none;
+    transition: all 0.3s ease;
+  }
+  .corner-brackets::before {
+    top: -2px; left: -2px;
+    border-right: none; border-bottom: none;
+  }
+  .corner-brackets::after {
+    bottom: -2px; right: -2px;
+    border-left: none; border-top: none;
+  }
+  .corner-brackets:hover::before, .corner-brackets:hover::after {
+    width: 25px; height: 25px;
+    box-shadow: var(--shadow-glow-cyan);
+  }
+
+  @keyframes glitch {
+    0% { transform: translate(0) }
+    20% { transform: translate(-2px, 2px) }
+    40% { transform: translate(-2px, -2px) }
+    60% { transform: translate(2px, 2px) }
+    80% { transform: translate(2px, -2px) }
+    100% { transform: translate(0) }
   }
 
   .hud-border-glow {
@@ -145,5 +223,19 @@
 
   .clip-edges {
     clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  }
+  
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .pb-safe {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 4rem);
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }

@@ -6,7 +6,8 @@ import ProgressionProfile from '../models/ProgressionProfile';
 
 export const claimDailyLogin = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const result = await economyService.claimDailyLogin(req.user!.id);
+    const timezoneOffset = req.body?.timezoneOffset || 0;
+    const result = await economyService.claimDailyLogin(req.user!.id, timezoneOffset);
     res.status(200).json({ status: 'success', data: result });
   } catch (error: any) {
     // If it's "Daily login already claimed today", we can return a 400

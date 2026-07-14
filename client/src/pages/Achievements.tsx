@@ -35,7 +35,7 @@ export const Achievements: React.FC = () => {
         initial={{ y: -30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: 'spring', damping: 20 }}
-        className="relative bg-gradient-to-b from-yellow-950/20 to-black/60 border border-yellow-900/50 rounded-3xl p-10 md:p-12 text-center overflow-hidden backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+        className="relative bg-gradient-to-b from-yellow-950/20 to-black/60 border border-yellow-900/50 rounded-3xl p-6 md:p-10 lg:p-12 text-center overflow-hidden backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
       >
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-yellow-500/10 rounded-full blur-[100px] pointer-events-none" />
         
@@ -48,7 +48,7 @@ export const Achievements: React.FC = () => {
             <Trophy className="w-12 h-12 text-yellow-400 drop-shadow-[0_0_10px_#eab308] group-hover:scale-110 transition-transform duration-300" />
           </motion.div>
 
-          <h1 className="text-4xl md:text-5xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 to-yellow-600 tracking-[0.3em] uppercase text-shadow-glow mb-4">
+          <h1 className="text-2xl md:text-4xl lg:text-5xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 to-yellow-600 tracking-[0.2em] md:tracking-[0.3em] uppercase text-shadow-glow mb-4">
             Hall of Records
           </h1>
           
@@ -73,7 +73,7 @@ export const Achievements: React.FC = () => {
       </motion.div>
 
       {/* GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-6">
         <AnimatePresence>
           {achievements.map((achievement, i) => (
             <motion.div
@@ -81,7 +81,7 @@ export const Achievements: React.FC = () => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: i * 0.05 }}
               key={achievement.id}
-              className={`relative overflow-hidden rounded-2xl p-6 transition-all duration-500 group ${
+              className={`relative overflow-hidden rounded-2xl p-4 md:p-6 transition-all duration-500 group ${
                 achievement.unlocked 
                   ? 'bg-gradient-to-br from-yellow-950/40 to-black/80 border border-yellow-500/30 hover:border-yellow-400 shadow-[0_0_30px_rgba(234,179,8,0.05)] hover:shadow-[0_0_40px_rgba(234,179,8,0.2)]' 
                   : 'bg-black/40 border border-gray-900/50 opacity-60 grayscale'
@@ -92,9 +92,9 @@ export const Achievements: React.FC = () => {
                 <div className="absolute -top-10 -right-10 w-40 h-40 bg-yellow-500/10 rounded-full blur-[40px] group-hover:bg-yellow-500/20 transition-colors duration-500" />
               )}
               
-              <div className="relative z-10 flex items-start gap-5">
+              <div className="relative z-10 flex items-start gap-3 md:gap-5">
                 {/* Icon Container */}
-                <div className={`flex-shrink-0 w-16 h-16 rounded-xl flex items-center justify-center border ${
+                <div className={`flex-shrink-0 w-12 h-12 md:w-16 md:h-16 rounded-xl flex items-center justify-center border ${
                   achievement.unlocked 
                     ? 'bg-yellow-950/50 border-yellow-500/50 shadow-[inset_0_0_15px_rgba(234,179,8,0.3)]' 
                     : 'bg-gray-900 border-gray-800'

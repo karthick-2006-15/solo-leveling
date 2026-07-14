@@ -10,7 +10,7 @@ const Skills = React.lazy(() => import('../pages/Skills').then(module => ({ defa
 const Track = React.lazy(() => import('../pages/Track').then(module => ({ default: module.Track })));
 const Achievements = React.lazy(() => import('../pages/Achievements').then(module => ({ default: module.Achievements })));
 const AnalyticsDashboard = React.lazy(() => import('../pages/AnalyticsDashboard').then(module => ({ default: module.AnalyticsDashboard })));
-const NotificationsSettings = React.lazy(() => import('../pages/NotificationsSettings').then(module => ({ default: module.NotificationsSettings })));
+const Settings = React.lazy(() => import('../pages/Settings').then(module => ({ default: module.Settings })));
 const NotFound = React.lazy(() => import('../pages/NotFound').then(module => ({ default: module.NotFound })));
 const AriaCommandCenter = React.lazy(() => import('../pages/AriaCommandCenter').then(module => ({ default: module.AriaCommandCenter })));
 const Vitals = React.lazy(() => import('../pages/Vitals').then(module => ({ default: module.Vitals })));
@@ -21,6 +21,8 @@ const HunterMuseum = React.lazy(() => import('../pages/HunterMuseum').then(modul
 const Inventory = React.lazy(() => import('../pages/Inventory').then(module => ({ default: module.Inventory })));
 const Dungeons = React.lazy(() => import('../pages/Dungeons').then(module => ({ default: module.Dungeons })));
 const Story = React.lazy(() => import('../pages/Story').then(module => ({ default: module.Story })));
+const ShadowArmy = React.lazy(() => import('../pages/ShadowArmy').then(module => ({ default: module.ShadowArmy })));
+const StatusWindow = React.lazy(() => import('../pages/StatusWindow'));
 const CareerDashboard = React.lazy(() => import('../pages/CareerDashboard'));
 const AcademicDashboard = React.lazy(() => import('../pages/AcademicDashboard'));
 const FinanceDashboard = React.lazy(() => import('../pages/FinanceDashboard'));
@@ -68,9 +70,11 @@ export const AnimatedRoutes: React.FC = () => {
         <Route path="/shop" element={<ProtectedRoute><PageWrapper><Shop /></PageWrapper></ProtectedRoute>} />
         <Route path="/museum" element={<ProtectedRoute><PageWrapper><HunterMuseum /></PageWrapper></ProtectedRoute>} />
         <Route path="/dungeons" element={<ProtectedRoute><PageWrapper><Dungeons /></PageWrapper></ProtectedRoute>} />
+        <Route path="/shadows" element={<ProtectedRoute><PageWrapper><ShadowArmy /></PageWrapper></ProtectedRoute>} />
+        <Route path="/status" element={<ProtectedRoute><PageWrapper><StatusWindow /></PageWrapper></ProtectedRoute>} />
         <Route path="/story" element={<ProtectedRoute><PageWrapper><Story /></PageWrapper></ProtectedRoute>} />
         <Route path="/inventory" element={<ProtectedRoute><PageWrapper><Inventory /></PageWrapper></ProtectedRoute>} />
-        <Route path="/settings" element={<ProtectedRoute><PageWrapper><NotificationsSettings /></PageWrapper></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute><PageWrapper><Settings /></PageWrapper></ProtectedRoute>} />
         <Route path="/career" element={<ProtectedRoute><PageWrapper><CareerDashboard /></PageWrapper></ProtectedRoute>} />
         <Route path="/academics" element={<ProtectedRoute><PageWrapper><AcademicDashboard /></PageWrapper></ProtectedRoute>} />
         <Route path="/finance" element={<ProtectedRoute><PageWrapper><FinanceDashboard /></PageWrapper></ProtectedRoute>} />

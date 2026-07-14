@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchProgression, devAwardXP, type ProgressionData, type AwardXPResult } from '../api/progressionApi';
+import { fetchProgression, devAwardXP, completeFocusSession, type ProgressionData, type AwardXPResult } from '../api/progressionApi';
 
 import { useAuthStore } from '../store/useAuthStore';
 
@@ -21,11 +21,21 @@ export const useProgression = () => {
     },
   });
 
+  const focusMutation = useMutation<AwardXPResult, Error, number>({
+    mutationFn: (durationMinutes) => completeFocusSession(durationMinutes),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['progression'] });
+      queryClient.invalidateQueries({ queryKey: ['monarch'] });
+    },
+  });
+
   return {
     progression,
     isLoading,
     isError,
     awardDevXP: awardMutation.mutateAsync,
-    isAwarding: awardMutation.isPending
+    isAwarding: awardMutation.isPending,
+    completeFocusSession: focusMutation.mutateAsync,
+    isCompletingFocus: focusMutation.isPending
   };
 };

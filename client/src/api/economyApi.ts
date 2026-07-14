@@ -15,8 +15,10 @@ export const economyApi = {
   },
   
   claimDailyLogin: async () => {
+    const timezoneOffset = new Date().getTimezoneOffset();
     const res = await fetchWithAuth(`${API_URL}/economy/login`, {
-      method: 'POST'
+      method: 'POST',
+      body: JSON.stringify({ timezoneOffset })
     });
     return res.json();
   },

@@ -35,6 +35,14 @@ class BossService {
       boss.isDefeated = true;
       boss.defeatedAt = new Date();
       defeated = true;
+    } else {
+      const hpPercentage = boss.currentHp / boss.totalHp;
+      if (hpPercentage <= 0.3) {
+        boss.isEnraged = true;
+        boss.phase = 2;
+        // Enraged boss takes less damage (simulate difficulty jump)
+        // Optionally we can increase damagePerMission, or do nothing.
+      }
     }
 
     await boss.save();

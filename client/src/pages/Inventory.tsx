@@ -45,7 +45,7 @@ export const Inventory: React.FC = () => {
         <InventoryFilters filters={filters} setFilters={setFilters} />
 
         {/* Grid Area */}
-        <div className="bg-black/40 border border-cyan-900/30 rounded-xl p-6 min-h-[400px]">
+        <div className="hud-glass corner-brackets p-3 md:p-6 min-h-[400px]">
           {isLoading ? (
             <div className="flex items-center justify-center h-64">
               <div className="text-cyan-500 animate-pulse tracking-widest uppercase">Scanning Inventory...</div>
@@ -56,7 +56,7 @@ export const Inventory: React.FC = () => {
               <div className="text-xs text-gray-600 uppercase tracking-widest">Adjust filters or earn rewards</div>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
               {items.map(item => (
                 <InventoryItemCard 
                   key={item._id} 

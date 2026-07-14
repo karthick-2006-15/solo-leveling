@@ -14,5 +14,13 @@ export const monarchApi = {
       method: 'POST'
     });
     return res.json();
+  },
+
+  adjustAttributes: async (changes: Record<string, number>) => {
+    const res = await fetchWithAuth(`${API_URL}/monarch/adjust`, {
+      method: 'POST',
+      body: JSON.stringify({ changes })
+    });
+    return res.json();
   }
 };

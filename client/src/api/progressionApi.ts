@@ -58,3 +58,12 @@ export const devAwardXP = async (source: string, amount: number): Promise<AwardX
   const data = await res.json();
   return data.result;
 };
+
+export const completeFocusSession = async (durationMinutes: number): Promise<AwardXPResult> => {
+  const res = await fetchWithAuth(`${API_BASE}/focus/complete`, {
+    method: 'POST',
+    body: JSON.stringify({ durationMinutes })
+  });
+  const data = await res.json();
+  return data.result;
+};

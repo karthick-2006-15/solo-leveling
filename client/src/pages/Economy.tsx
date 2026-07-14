@@ -5,6 +5,8 @@ import { PageHeader } from '../components/ui/PageHeader';
 import { SystemWindow } from '../components/ui/SystemWindow';
 import { Coins, History, TrendingUp, Calendar, Zap, Star } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { XPTimeline } from '../components/economy/XPTimeline';
+import { DailyLoginHistory } from '../components/economy/DailyLoginHistory';
 
 export const Economy: React.FC = () => {
   const { data: statsData, isLoading: isLoadingStats } = useQuery({
@@ -40,30 +42,30 @@ export const Economy: React.FC = () => {
         />
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
           <SystemWindow innerClassName="p-4 flex flex-col items-center text-center justify-center relative overflow-hidden group">
             <div className="absolute inset-0 bg-yellow-500/5 group-hover:bg-yellow-500/10 transition-colors pointer-events-none" />
             <Coins className="w-8 h-8 text-yellow-400 mb-2 drop-shadow-[0_0_10px_rgba(250,204,21,0.5)]" />
             <div className="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Current Coins</div>
-            <div className="text-2xl font-display text-white">{stats?.coins || 0}</div>
+            <div className="text-xl md:text-2xl font-display text-white">{stats?.coins || 0}</div>
           </SystemWindow>
 
           <SystemWindow innerClassName="p-4 flex flex-col items-center text-center justify-center">
             <TrendingUp className="w-8 h-8 text-indigo-400 mb-2" />
             <div className="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Lifetime Earned</div>
-            <div className="text-2xl font-display text-white">{stats?.lifetimeCoinsEarned || 0}</div>
+            <div className="text-xl md:text-2xl font-display text-white">{stats?.lifetimeCoinsEarned || 0}</div>
           </SystemWindow>
 
           <SystemWindow innerClassName="p-4 flex flex-col items-center text-center justify-center">
             <Calendar className="w-8 h-8 text-cyan-400 mb-2" />
             <div className="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Login Streak</div>
-            <div className="text-2xl font-display text-white">{stats?.currentLoginStreak || 0} <span className="text-sm text-gray-500">days</span></div>
+            <div className="text-xl md:text-2xl font-display text-white">{stats?.currentLoginStreak || 0} <span className="text-sm text-gray-500">days</span></div>
           </SystemWindow>
 
           <SystemWindow innerClassName="p-4 flex flex-col items-center text-center justify-center">
             <Star className="w-8 h-8 text-purple-400 mb-2" />
             <div className="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Weekly Coins</div>
-            <div className="text-2xl font-display text-white">{stats?.weeklyCoins || 0}</div>
+            <div className="text-xl md:text-2xl font-display text-white">{stats?.weeklyCoins || 0}</div>
           </SystemWindow>
         </div>
 
@@ -87,7 +89,7 @@ export const Economy: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex gap-4">
+                  <div className="flex flex-wrap gap-2 md:gap-4">
                     {log.coins > 0 && (
                       <div className="flex items-center gap-1 bg-yellow-900/20 px-3 py-1.5 rounded border border-yellow-700/50">
                         <Coins className="w-3 h-3 text-yellow-400" />
@@ -112,6 +114,11 @@ export const Economy: React.FC = () => {
             )}
           </div>
         </SystemWindow>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          <XPTimeline />
+          <DailyLoginHistory />
+        </div>
 
       </div>
     </div>

@@ -52,13 +52,13 @@ export const Shop: React.FC = () => {
             <div className="text-gray-500 tracking-widest uppercase mb-2">No Items Available</div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
             {items.map(item => {
               const config = rarityConfig[item.rarity] || rarityConfig['Common'];
               const canAfford = (progression?.coins || 0) >= item.price;
 
               return (
-                <div key={item._id} className={`relative rounded-xl border ${config.border} bg-black/60 p-5 flex flex-col gap-4 overflow-hidden transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,0,0,0.5)] group`}>
+                <div key={item._id} className={`relative rounded-xl border ${config.border} bg-black/60 p-4 md:p-5 flex flex-col gap-3 md:gap-4 overflow-hidden transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,0,0,0.5)] group`}>
                   {/* Background overlay */}
                   <div className={`absolute inset-0 bg-gradient-to-br from-black/80 to-transparent z-0`} />
                   <div className={`absolute left-0 top-0 w-1 h-full ${config.bg} z-0`} />
@@ -98,7 +98,7 @@ export const Shop: React.FC = () => {
                     <PrimaryButton 
                       onClick={() => handlePurchase(item.itemId, item.name, item.price)}
                       disabled={!canAfford || purchaseItem.isPending}
-                      className="px-4 py-1.5 text-xs flex items-center gap-2"
+                      className="px-4 py-2 text-xs flex items-center gap-2 min-h-[44px]"
                     >
                       {!canAfford ? <><Lock className="w-3 h-3" /> Locked</> : 'Purchase'}
                     </PrimaryButton>

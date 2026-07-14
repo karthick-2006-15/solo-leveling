@@ -22,7 +22,7 @@ export const SystemWindow: React.FC<SystemWindowProps> = ({
   headerAction,
   ...props
 }) => {
-  const baseClasses = "relative hud-glass clip-edges overflow-hidden group";
+  const baseClasses = "relative hud-glass clip-edges overflow-hidden group corner-brackets";
   
   const variants = {
     default: "border-[rgba(0,229,255,0.2)] bg-[rgba(10,15,26,0.6)]",
@@ -36,13 +36,6 @@ export const SystemWindow: React.FC<SystemWindowProps> = ({
     gold: "hover:border-[var(--color-system-gold)] hover:shadow-glow-gold",
     boss: "hover:border-[var(--color-system-red)] hover:shadow-glow-red",
     purple: "hover:border-[var(--color-system-purple)] hover:shadow-[0_0_12px_rgba(157,78,221,0.9)]"
-  };
-
-  const borderColors = {
-    default: "border-[var(--color-system-blue)]",
-    gold: "border-[var(--color-system-gold)]",
-    boss: "border-[var(--color-system-red)]",
-    purple: "border-[var(--color-system-purple)]"
   };
 
   const textColors = {
@@ -73,8 +66,9 @@ export const SystemWindow: React.FC<SystemWindowProps> = ({
       {...props}
     >
       {/* Corner accents */}
-      <div className={`absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 ${borderColors[variant]} opacity-70 z-10 pointer-events-none`} />
-      <div className={`absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 ${borderColors[variant]} opacity-70 z-10 pointer-events-none`} />
+      {/* Remove manual corner accents in favor of the CSS corner-brackets which animate nicely */}
+      {/* <div className={\`absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 \${borderColors[variant]} opacity-70 z-10 pointer-events-none\`} /> */}
+      {/* <div className={\`absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 \${borderColors[variant]} opacity-70 z-10 pointer-events-none\`} /> */}
       
       {/* Animated scanline effect on hover */}
       {hoverEffect && (

@@ -4,6 +4,7 @@ import dns from 'node:dns';
 dns.setServers(['8.8.8.8', '1.1.1.1']);
 
 import express from 'express';
+import statusRoutes from './routes/statusRoutes';
 import path from 'path';
 import dotenvSafe from 'dotenv-safe';
 import mongoose from 'mongoose';
@@ -98,11 +99,13 @@ async function bootstrap() {
     const inventoryRoutes = (await import('./routes/inventoryRoutes')).default;
     const monarchRoutes = (await import('./routes/monarchRoutes')).default;
     const rewardRoutes = (await import('./routes/rewardRoutes')).default;
+    const storyRoutes = (await import('./routes/storyRoutes')).default;
     
     // Error Handler
     const { globalErrorHandler } = await import('./middleware/errorHandler');
     // Cron Jobs
     const { startCronJobs } = await import('./cron/notificationJobs');
+    const { startStoryCronJobs } = await import('./cron/dailyStoryCron');
 
     const app = express();
     const PORT = process.env.PORT || 5000;
@@ -151,6 +154,7 @@ async function bootstrap() {
     
     // Additional Subsystem Mounting
     app.use('/api/academics', academicRoutes);
+    app.use('/api/status', statusRoutes);
     app.use('/api/aria', ariaRoutes);
     app.use('/api/career', careerRoutes);
     app.use('/api/dungeons', dungeonRoutes);
@@ -160,6 +164,7 @@ async function bootstrap() {
     app.use('/api/inventory', inventoryRoutes);
     app.use('/api/monarch', monarchRoutes);
     app.use('/api/rewards', rewardRoutes);
+    app.use('/api/story', storyRoutes);
 
     // Serve Frontend in Production
     if (process.env.NODE_ENV === 'production') {
@@ -181,6 +186,7 @@ async function bootstrap() {
       console.log(`[BOOT] ✅ Server is successfully running and bound to port ${PORT}`);
       console.log('[BOOT] 7. Initializing Background Tasks...');
       startCronJobs();
+      startStoryCronJobs();
       console.log('[BOOT] ✅ SYSTEM FULLY ONLINE AND READY');
     }).on('error', (err: any) => {
       if (err.code === 'EADDRINUSE') {

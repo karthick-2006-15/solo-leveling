@@ -44,7 +44,9 @@ class MonarchService {
       consistency: 0,
       patience: 0,
       adaptability: 0,
-      selfControl: 0
+      selfControl: 0,
+      corruption: 0,
+      dopamineBalance: 0
     };
 
     // Calculate Discipline (Mission / Habit completion)
@@ -57,15 +59,33 @@ class MonarchService {
 
     if (quests.length > 0) {
       const completionRate = completedQuests / quests.length;
-      if (completionRate > 0.8) deltas.discipline += 1;
-      else if (completionRate < 0.4) deltas.discipline -= 1;
+      if (completionRate > 0.8) {
+        deltas.discipline += 1;
+        deltas.dopamineBalance += 10; // High dopamine from success
+      }
+      else if (completionRate < 0.4) {
+        deltas.discipline -= 1;
+        deltas.dopamineBalance -= 5;
+      }
     }
 
     if (habits.length > 3) deltas.discipline += 1;
 
-    // Calculate Willpower
-    if (abandonedQuests > 0) deltas.willpower -= 1;
-    // (Future: cold shower / difficult quests)
+    // Calculate Willpower and Corruption
+    if (abandonedQuests > 0) {
+      deltas.willpower -= 2;
+      deltas.corruption += (abandonedQuests * 5); // Failing missions corrupts the user
+    }
+    
+    // Recovery protocols slightly reduce corruption and restore dopamine
+    if (recovery && recovery.recoveryScore > 80) {
+      deltas.corruption -= 5;
+      deltas.dopamineBalance += 5;
+    }
+
+    if (recovery && recovery.components?.stressPenalty > 10) {
+       deltas.dopamineBalance -= 15; // High stress depletes dopamine
+    }
 
     // Calculate Focus & Wisdom
     let totalFocusMinutes = 0;
@@ -85,7 +105,7 @@ class MonarchService {
 
     // Apply Deltas with bounds checking (0-100)
     for (const key of Object.keys(deltas)) {
-      const k = key as keyof typeof monarch.attributes;
+      const k = key as keyof typeof deltas;
       monarch.attributes[k] = Math.min(100, Math.max(0, monarch.attributes[k] + deltas[k]));
     }
 
@@ -132,6 +152,30 @@ class MonarchService {
     let monarch = await InnerMonarch.findOne({ userId });
     if (!monarch) {
       monarch = await InnerMonarch.create({ userId });
+    }
+    return monarch;
+  }
+
+  /**
+   * Directly adjust monarch attributes in real-time (e.g., from completing a Focus Session).
+   */
+  async adjustAttributes(userId: string, changes: Partial<Record<keyof typeof InnerMonarch.schema.obj.attributes, number>>) {
+    let monarch = await InnerMonarch.findOne({ userId });
+    if (!monarch) {
+      monarch = await InnerMonarch.create({ userId });
+    }
+
+    let modified = false;
+    for (const [key, value] of Object.entries(changes)) {
+      const attrKey = key as keyof typeof monarch.attributes;
+      if (typeof monarch.attributes[attrKey] !== 'undefined' && typeof value === 'number') {
+        monarch.attributes[attrKey] = Math.min(100, Math.max(0, monarch.attributes[attrKey] + value));
+        modified = true;
+      }
+    }
+
+    if (modified) {
+      await monarch.save();
     }
     return monarch;
   }

@@ -7,6 +7,8 @@ export interface IBoss extends Document {
   totalHp: number;
   currentHp: number;
   damagePerMission: number;
+  phase: number;
+  isEnraged: boolean;
   isDefeated: boolean;
   rewards: {
     xp?: number;
@@ -23,6 +25,8 @@ const BossSchema: Schema = new Schema({
   totalHp: { type: Number, required: true, default: 100 },
   currentHp: { type: Number, required: true, default: 100 },
   damagePerMission: { type: Number, required: true, default: 20 },
+  phase: { type: Number, default: 1 },
+  isEnraged: { type: Boolean, default: false },
   isDefeated: { type: Boolean, default: false },
   rewards: {
     xp: { type: Number, default: 0 },

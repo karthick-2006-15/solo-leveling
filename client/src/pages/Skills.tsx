@@ -127,14 +127,14 @@ export const Skills: React.FC = () => {
   };
 
   return (
-    <div className="relative space-y-8 pb-24 md:pb-8 font-sans z-10 animate-[fade-in_0.5s_ease-out]">
+    <div className="relative space-y-4 md:space-y-8 pb-24 md:pb-8 font-sans z-10 animate-[fade-in_0.5s_ease-out]">
       <AchievementToast toasts={toasts} removeToast={(id) => setToasts(prev => prev.filter(t => t.id !== id))} />
       <LevelUpModal isOpen={levelUpData.isOpen} onClose={() => setLevelUpData({ ...levelUpData, isOpen: false })} newLevel={levelUpData.level} newRank={levelUpData.rank} rankChanged={levelUpData.rankChanged} />
 
       {/* HEADER */}
       <motion.div 
         initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-        className="bg-black/60 border border-purple-900/50 rounded-2xl p-6 md:p-8 backdrop-blur-xl shadow-[0_0_40px_rgba(0,0,0,0.8)] relative overflow-hidden flex flex-col md:flex-row justify-between items-center gap-6"
+        className="bg-black/60 border border-purple-900/50 rounded-2xl p-4 md:p-6 lg:p-8 backdrop-blur-xl shadow-[0_0_40px_rgba(0,0,0,0.8)] relative overflow-hidden flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6"
       >
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-purple-500/0 via-purple-500/50 to-purple-500/0 opacity-50" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-purple-500/10 rounded-full blur-[80px] pointer-events-none" />
@@ -150,21 +150,21 @@ export const Skills: React.FC = () => {
 
         <button 
           onClick={() => { setIsCreateModalOpen(true); play('click'); }}
-          className="relative z-10 px-6 py-3 bg-purple-950/80 border border-purple-400 text-purple-300 hover:bg-purple-400 hover:text-black rounded text-[11px] font-mono uppercase tracking-[0.2em] font-bold transition-all shadow-[0_0_15px_rgba(192,132,252,0.2)] flex items-center gap-2"
+          className="relative z-10 w-full md:w-auto px-6 py-3 min-h-[44px] bg-purple-950/80 border border-purple-400 text-purple-300 hover:bg-purple-400 hover:text-black rounded text-[11px] font-mono uppercase tracking-[0.2em] font-bold transition-all shadow-[0_0_15px_rgba(192,132,252,0.2)] flex items-center justify-center gap-2"
         >
           <Plus className="w-4 h-4" /> Add Neural Node
         </button>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
         
         {/* SKILL TREE (LEFT COLUMN) */}
-        <div className="lg:col-span-1 space-y-4">
+        <div className="lg:col-span-1 space-y-3 md:space-y-4">
           <h2 className="font-mono text-[10px] text-purple-500 uppercase tracking-[0.3em] border-b border-purple-900/50 pb-2 flex items-center gap-2">
             <BookOpen className="w-3 h-3" /> Active Nodes
           </h2>
           
-          <div className="space-y-4 max-h-[600px] overflow-y-auto custom-scrollbar pr-2">
+          <div className="space-y-3 md:space-y-4 max-h-[300px] lg:max-h-[600px] overflow-y-auto custom-scrollbar pr-1 md:pr-2">
             {skills.map((skill: any) => {
               const isActive = selectedSkill?._id === skill._id;
               const progress = skill.xpRequired > 0 ? (skill.currentXP / skill.xpRequired) * 100 : 0;
@@ -233,7 +233,7 @@ export const Skills: React.FC = () => {
                     </div>
                   </div>
                   
-                  <button onClick={() => setIsStudyModalOpen(true)} className="px-6 py-2 bg-purple-950/80 border border-purple-400 text-purple-300 hover:bg-purple-400 hover:text-black rounded text-[11px] font-mono uppercase tracking-[0.2em] font-bold transition-all shadow-[0_0_15px_rgba(192,132,252,0.2)] flex items-center gap-2">
+                  <button onClick={() => setIsStudyModalOpen(true)} className="w-full md:w-auto px-6 py-2 min-h-[44px] bg-purple-950/80 border border-purple-400 text-purple-300 hover:bg-purple-400 hover:text-black rounded text-[11px] font-mono uppercase tracking-[0.2em] font-bold transition-all shadow-[0_0_15px_rgba(192,132,252,0.2)] flex items-center justify-center gap-2">
                     <Zap className="w-4 h-4" /> Log Session
                   </button>
                 </div>
@@ -244,7 +244,7 @@ export const Skills: React.FC = () => {
                     <button 
                       key={tab}
                       onClick={() => setActiveTab(tab as any)}
-                      className={`px-6 py-2 rounded text-[10px] font-mono font-bold tracking-[0.2em] uppercase whitespace-nowrap transition-all ${
+                      className={`px-4 md:px-6 py-2 min-h-[44px] rounded text-[10px] font-mono font-bold tracking-[0.2em] uppercase whitespace-nowrap transition-all ${
                         activeTab === tab 
                           ? 'bg-purple-950/60 text-purple-300 border border-purple-500 shadow-[0_0_15px_rgba(192,132,252,0.2)]' 
                           : 'text-gray-500 hover:text-purple-400 border border-transparent'
@@ -259,7 +259,7 @@ export const Skills: React.FC = () => {
                 <div className="min-h-[300px]">
                   {activeTab === 'overview' && (
                     <div className="space-y-6">
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                         <div className="bg-purple-950/20 border border-purple-900/30 p-4 rounded-xl text-center">
                           <Target className="w-6 h-6 text-purple-500 mx-auto mb-2" />
                           <div className="text-2xl font-mono text-white">{selectedSkill.milestones?.filter((m:any) => m.completed).length || 0}</div>
@@ -300,11 +300,11 @@ export const Skills: React.FC = () => {
                         </button>
                       </div>
                       {selectedSkill.milestones?.map((m: any) => (
-                        <div key={m._id} className={`flex items-center gap-4 p-4 rounded-xl border ${m.completed ? 'bg-purple-950/20 border-purple-900/30 opacity-60' : 'bg-black/40 border-purple-800'}`}>
+                          <div key={m._id} className={`flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-xl border ${m.completed ? 'bg-purple-950/20 border-purple-900/30 opacity-60' : 'bg-black/40 border-purple-800'}`}>
                           <button 
                             onClick={() => !m.completed && handleCompleteMilestone(selectedSkill._id, m._id)}
                             disabled={m.completed}
-                            className={`flex-shrink-0 w-8 h-8 rounded-full border flex items-center justify-center transition-colors ${m.completed ? 'bg-purple-500 border-purple-500 text-black' : 'border-purple-700 text-purple-700 hover:border-purple-400 hover:text-purple-400'}`}
+                            className={`flex-shrink-0 w-10 h-10 md:w-8 md:h-8 min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0 rounded-full border flex items-center justify-center transition-colors ${m.completed ? 'bg-purple-500 border-purple-500 text-black' : 'border-purple-700 text-purple-700 hover:border-purple-400 hover:text-purple-400'}`}
                           >
                             {m.completed ? <CheckCircle2 className="w-5 h-5" /> : <Crosshair className="w-4 h-4" />}
                           </button>
@@ -374,9 +374,9 @@ export const Skills: React.FC = () => {
         <form onSubmit={handleCreateSkill} className="space-y-6">
           <div>
             <label className="block text-[10px] font-mono tracking-widest text-purple-400 mb-2 uppercase">Subject Designation</label>
-            <input type="text" name="name" required className="w-full bg-black/50 border border-purple-900 rounded p-3 text-white font-display focus:border-purple-500 focus:outline-none" placeholder="E.g. Quantum Physics" />
+            <input type="text" name="name" required className="w-full bg-black/50 border border-purple-900 rounded p-3 text-base text-white font-display focus:border-purple-500 focus:outline-none" placeholder="E.g. Quantum Physics" />
           </div>
-          <button type="submit" disabled={isSubmitting} className="w-full py-3 bg-purple-950 border border-purple-400 text-purple-300 hover:bg-purple-400 hover:text-black rounded font-display tracking-[0.2em] uppercase transition-colors">
+          <button type="submit" disabled={isSubmitting} className="w-full py-3 min-h-[44px] bg-purple-950 border border-purple-400 text-purple-300 hover:bg-purple-400 hover:text-black rounded font-display tracking-[0.2em] uppercase transition-colors">
             {isSubmitting ? 'PROCESSING...' : 'INITIALIZE'}
           </button>
         </form>
@@ -386,13 +386,13 @@ export const Skills: React.FC = () => {
         <form onSubmit={handleAddMilestone} className="space-y-6">
           <div>
             <label className="block text-[10px] font-mono tracking-widest text-purple-400 mb-2 uppercase">Objective</label>
-            <input type="text" name="title" required className="w-full bg-black/50 border border-purple-900 rounded p-3 text-white font-display focus:border-purple-500 focus:outline-none" />
+            <input type="text" name="title" required className="w-full bg-black/50 border border-purple-900 rounded p-3 text-base text-white font-display focus:border-purple-500 focus:outline-none" />
           </div>
           <div>
             <label className="block text-[10px] font-mono tracking-widest text-purple-400 mb-2 uppercase">XP Yield</label>
-            <input type="number" name="xpReward" required defaultValue={100} className="w-full bg-black/50 border border-purple-900 rounded p-3 text-white font-mono focus:border-purple-500 focus:outline-none" />
+            <input type="number" name="xpReward" required defaultValue={100} className="w-full bg-black/50 border border-purple-900 rounded p-3 text-base text-white font-mono focus:border-purple-500 focus:outline-none" />
           </div>
-          <button type="submit" disabled={isSubmitting} className="w-full py-3 bg-purple-950 border border-purple-400 text-purple-300 hover:bg-purple-400 hover:text-black rounded font-display tracking-[0.2em] uppercase transition-colors">
+          <button type="submit" disabled={isSubmitting} className="w-full py-3 min-h-[44px] bg-purple-950 border border-purple-400 text-purple-300 hover:bg-purple-400 hover:text-black rounded font-display tracking-[0.2em] uppercase transition-colors">
             CREATE DIRECTIVE
           </button>
         </form>
@@ -402,13 +402,13 @@ export const Skills: React.FC = () => {
         <form onSubmit={handleLogStudy} className="space-y-6">
           <div>
             <label className="block text-[10px] font-mono tracking-widest text-purple-400 mb-2 uppercase">Duration (Minutes)</label>
-            <input type="number" name="minutes" required min="1" defaultValue={30} className="w-full bg-black/50 border border-purple-900 rounded p-3 text-white font-mono focus:border-purple-500 focus:outline-none" />
+            <input type="number" name="minutes" required min="1" defaultValue={30} className="w-full bg-black/50 border border-purple-900 rounded p-3 text-base text-white font-mono focus:border-purple-500 focus:outline-none" />
           </div>
           <div>
             <label className="block text-[10px] font-mono tracking-widest text-purple-400 mb-2 uppercase">Session Notes (Optional)</label>
-            <textarea name="notes" className="w-full bg-black/50 border border-purple-900 rounded p-3 text-white font-sans text-sm focus:border-purple-500 focus:outline-none h-24" />
+            <textarea name="notes" className="w-full bg-black/50 border border-purple-900 rounded p-3 text-base text-white font-sans text-sm focus:border-purple-500 focus:outline-none h-24" />
           </div>
-          <button type="submit" disabled={isSubmitting} className="w-full py-3 bg-purple-950 border border-purple-400 text-purple-300 hover:bg-purple-400 hover:text-black rounded font-display tracking-[0.2em] uppercase transition-colors">
+          <button type="submit" disabled={isSubmitting} className="w-full py-3 min-h-[44px] bg-purple-950 border border-purple-400 text-purple-300 hover:bg-purple-400 hover:text-black rounded font-display tracking-[0.2em] uppercase transition-colors">
             TRANSMIT LOG
           </button>
         </form>

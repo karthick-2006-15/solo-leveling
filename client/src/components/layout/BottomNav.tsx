@@ -22,23 +22,24 @@ export const BottomNav: React.FC = () => {
     { name: 'Gates', path: '/dungeons', icon: DungeonIcon },
     { name: 'Lore', path: '/story', icon: BookOpen },
     { name: 'Inventory', path: '/inventory', icon: Box },
-    { name: 'Profile', path: '/profile', icon: UserIcon },
+    { name: 'Status', path: '/status', icon: UserIcon },
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[var(--color-system-dark)] border-t border-[var(--color-system-border)] md:top-0 md:bottom-auto md:border-t-0 md:border-b safe-area-bottom">
-      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 hud-glass md:top-0 md:bottom-auto md:border-b-2 border-t-2 md:border-t-0 border-[var(--color-system-cyan)] safe-area-bottom shadow-glow-cyan shadow-[0_0_15px_rgba(0,255,255,0.2)]">
+      <div className="absolute inset-0 bg-black/60 pointer-events-none" />
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 relative z-10">
         <div className="flex justify-between items-center h-16 relative">
           
           {/* Desktop Logo (hidden on mobile) */}
           <div className="hidden md:flex items-center mr-8">
-            <Link to="/" className="font-display text-xl font-bold uppercase tracking-widest text-[var(--color-system-blue)] drop-shadow-[0_0_10px_rgba(0,212,255,0.5)]">
-              SOLO LEVELING
+            <Link to="/" className="font-display text-2xl font-bold uppercase tracking-[0.2em] text-white text-shadow-glow flex items-center gap-2">
+              <span className="text-cyan-400">S</span>OLO <span className="text-cyan-400">L</span>EVELING
             </Link>
           </div>
 
           {/* Navigation Items */}
-          <div className="flex justify-around items-center w-full md:w-auto md:gap-8 relative h-full">
+          <div className="flex justify-start sm:justify-around items-center w-full md:w-auto gap-1 sm:gap-2 md:gap-8 relative h-full overflow-x-auto pb-1 md:pb-0 hide-scrollbar scroll-smooth px-2">
             {tabs.map((tab) => {
               const isActive = location.pathname === tab.path || 
                 (tab.name === 'Track' && ['/workouts', '/nutrition', '/skills', '/dsa'].includes(location.pathname));
@@ -53,7 +54,7 @@ export const BottomNav: React.FC = () => {
                     play('click');
                     haptics.lightTap();
                   }}
-                  className={`relative flex flex-col items-center justify-center w-full h-full md:w-auto md:px-4 transition-colors duration-200 z-10 ${
+                  className={`relative flex flex-col items-center justify-center flex-shrink-0 min-w-[64px] sm:min-w-[72px] h-full md:w-auto md:px-4 transition-colors duration-200 z-10 ${
                     isActive ? 'text-[var(--color-system-blue)]' : 'text-[var(--color-system-text-dim)] hover:text-white'
                   }`}
                 >
@@ -69,8 +70,7 @@ export const BottomNav: React.FC = () => {
                   {isActive && (
                     <motion.div
                       layoutId="bottomNavIndicator"
-                      className="absolute bottom-0 left-[20%] right-[20%] h-[3px] bg-[var(--color-system-blue)] rounded-t-[3px] md:bottom-[-1px] md:left-0 md:right-0 md:h-[2px]"
-                      style={{ boxShadow: '0 -2px 10px var(--color-system-blue)' }}
+                      className="absolute bottom-[2px] left-[15%] right-[15%] h-[4px] bg-cyan-400 rounded-t-[3px] md:bottom-[-2px] md:left-0 md:right-0 md:h-[3px] shadow-[0_0_10px_#00ffff]"
                       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                     />
                   )}

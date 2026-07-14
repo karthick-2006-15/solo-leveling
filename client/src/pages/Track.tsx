@@ -114,7 +114,7 @@ export const Track: React.FC = () => {
         subtitle="Universal Tracking Interface" 
       />
 
-      <div className="space-y-4 max-w-7xl mx-auto px-4 mt-6">
+      <div className="space-y-3 md:space-y-4 max-w-7xl mx-auto px-3 md:px-4 mt-4 md:mt-6">
         {MODULES.map((mod) => {
           const isActive = activeModuleId === mod.id;
           const Icon = mod.icon;
@@ -123,17 +123,17 @@ export const Track: React.FC = () => {
             <div 
               key={mod.id} 
               ref={(el) => { moduleRefs.current[mod.id] = el; }}
-              className={`rounded-xl border transition-all duration-300 overflow-hidden ${
+              className={`hud-glass corner-brackets transition-all duration-300 overflow-hidden ${
                 isActive 
-                  ? 'bg-black/60 shadow-[0_0_20px_rgba(0,0,0,0.5)]' 
-                  : 'bg-black/30 hover:bg-black/40 border-white/5'
+                  ? '' 
+                  : 'bg-black/30 hover:bg-black/40 border-white/5 grayscale opacity-70'
               }`}
               style={{ borderColor: isActive ? mod.color : undefined }}
             >
               {/* Header / Accordion Toggle */}
               <button
                 onClick={() => handleToggle(mod.id)}
-                className="w-full flex items-center justify-between p-4 cursor-pointer focus:outline-none"
+                className="w-full flex items-center justify-between p-3 md:p-4 min-h-[44px] cursor-pointer focus:outline-none"
               >
                 <div className="flex items-center gap-3">
                   <div 
@@ -143,7 +143,7 @@ export const Track: React.FC = () => {
                     <Icon size={20} />
                   </div>
                   <h3 
-                    className="font-display uppercase tracking-widest text-lg"
+                    className="font-display uppercase tracking-widest text-base md:text-lg"
                     style={{ color: isActive ? mod.color : 'var(--color-system-text-dim)' }}
                   >
                     {mod.title}
@@ -164,7 +164,7 @@ export const Track: React.FC = () => {
                     transition={{ duration: 0.3 }}
                     className="overflow-hidden"
                   >
-                    <div className="p-4 pt-0 border-t border-white/5 mt-2">
+                    <div className="p-3 md:p-4 pt-0 border-t border-white/5 mt-2">
                       <mod.component />
                     </div>
                   </motion.div>

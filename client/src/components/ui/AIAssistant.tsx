@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, Bot, Terminal } from 'lucide-react';
+import { X, Send, Terminal } from 'lucide-react';
+import { AriaCore } from '../aria/AriaCore';
 import { fetchWithAuth } from '../../api/fetchHelper';
 import { HUDCard } from './HUDCard';
 import { useSystemSound } from '../../hooks/useSystemSound';
@@ -11,7 +12,7 @@ export const AIAssistant: React.FC = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(location.pathname === '/assistant');
   const [messages, setMessages] = useState<{ role: 'user' | 'system', content: string }[]>([
-    { role: 'system', content: 'SYSTEM ARIA ONLINE. HOW CAN I ASSIST YOU TODAY, HUNTER?' }
+    { role: 'system', content: 'SYSTEM IGGRIS ONLINE. AWAITING YOUR ORDERS, COMMANDER.' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -87,7 +88,7 @@ export const AIAssistant: React.FC = () => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
           >
-            <Bot size={28} />
+            <AriaCore size={28} />
           </motion.button>
         )}
       </AnimatePresence>
@@ -106,7 +107,7 @@ export const AIAssistant: React.FC = () => {
               variant="default" 
               className="flex-1 flex flex-col h-full shadow-2xl" 
               innerClassName="p-0 flex flex-col h-full overflow-hidden"
-              title="SYSTEM // ARIA"
+              title="SYSTEM // IGGRIS"
               headerAction={
                 <button onClick={handleClose} className="text-[var(--color-system-text-dim)] hover:text-white transition-colors">
                   <X size={18} />

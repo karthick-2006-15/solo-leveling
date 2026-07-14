@@ -8,17 +8,20 @@ import { rewardEngine } from './rewardEngine';
 import _logger from '../utils/logger';
 
 class EconomyService {
-  async claimDailyLogin(userId: string) {
+  async claimDailyLogin(userId: string, timezoneOffset: number = 0) {
     const profile = await ProgressionProfile.findOne({ userId });
     if (!profile) throw new Error('Profile not found');
 
     const now = new Date();
-    const today = new Date(now);
+    // Adjust 'now' to user's local time by subtracting the timezone offset (minutes)
+    const localTime = now.getTime() - (timezoneOffset * 60000);
+    const today = new Date(localTime);
     today.setUTCHours(0, 0, 0, 0);
 
     // Use the dedicated lastClaimDate for login streak purposes
     if (profile.lastClaimDate) {
-      const last = new Date(profile.lastClaimDate);
+      const lastLocalTime = profile.lastClaimDate.getTime() - (timezoneOffset * 60000);
+      const last = new Date(lastLocalTime);
       last.setUTCHours(0, 0, 0, 0);
 
       const diffTime = Math.abs(today.getTime() - last.getTime());

@@ -39,3 +39,13 @@ export const getHealthAnalytics = async (req: AuthRequest, res: Response, next: 
     next(error);
   }
 };
+
+export const getTodayStatus = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const targetDateStr = req.query.date as string;
+    const status = await healthService.getTodayStatus(req.user!.id, targetDateStr);
+    res.status(200).json({ status: 'success', data: status });
+  } catch (error) {
+    next(error);
+  }
+};

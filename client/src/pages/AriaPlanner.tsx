@@ -17,15 +17,15 @@ const AriaPlanner: React.FC = () => {
     <div className="w-full pb-32">
       <div className="p-6 max-w-7xl mx-auto space-y-6">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-slate-800 p-6 rounded-lg border border-slate-700 shadow-xl">
-          <h1 className="text-3xl font-bold text-white mb-2 tracking-wider">ARIA <span className="text-blue-500">PLANNER</span></h1>
+          <h1 className="text-3xl font-bold text-white mb-2 tracking-wider">IGGRIS <span className="text-blue-500">PLANNER</span></h1>
           <p className="text-slate-400">Generate intelligent, adaptive roadmaps powered by your Hunter context.</p>
         </motion.div>
 
-        <div className="bg-slate-800 p-6 rounded-lg border border-slate-700 flex gap-4 items-center">
+        <div className="bg-slate-800 p-4 md:p-6 rounded-lg border border-slate-700 flex flex-col sm:flex-row gap-3 md:gap-4 items-stretch sm:items-center">
           <select 
             value={planType} 
             onChange={(e) => setPlanType(e.target.value)}
-            className="bg-slate-900 border border-slate-600 text-white p-3 rounded"
+            className="bg-slate-900 border border-slate-600 text-white p-3 rounded text-base md:text-sm focus:border-blue-500 focus:outline-none"
           >
             <option value="DAILY">Daily Plan</option>
             <option value="WEEKLY">Weekly Roadmap</option>
@@ -40,13 +40,13 @@ const AriaPlanner: React.FC = () => {
             value={goal} 
             onChange={(e) => setGoal(e.target.value)}
             placeholder="e.g. Master React and get a frontend internship..." 
-            className="flex-1 bg-slate-900 border border-slate-600 p-3 rounded text-white focus:border-blue-500 focus:outline-none"
+            className="flex-1 bg-slate-900 border border-slate-600 p-3 rounded text-white text-base md:text-sm focus:border-blue-500 focus:outline-none"
           />
           
           <button 
             onClick={handleGeneratePlan}
             disabled={createPlan.isPending || !goal}
-            className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded font-bold transition-colors disabled:opacity-50"
+            className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded font-bold transition-colors disabled:opacity-50 w-full sm:w-auto min-h-[44px]"
           >
             {createPlan.isPending ? 'Synthesizing...' : 'Generate Plan'}
           </button>
