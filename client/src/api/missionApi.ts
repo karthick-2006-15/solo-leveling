@@ -62,6 +62,12 @@ export const fetchBadges = async (): Promise<Badge[]> => {
   return data.badges;
 };
 
+export const fetchCheckInStatus = async (): Promise<boolean> => {
+  const res = await fetchWithAuth(`${API_BASE}/check-in/status`);
+  const data = await res.json();
+  return data.hasCheckedInToday;
+};
+
 export const fetchShadows = async (): Promise<QuestInstance[]> => {
   const res = await fetchWithAuth(`${API_BASE}/shadows`);
   const data = await res.json();

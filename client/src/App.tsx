@@ -14,6 +14,7 @@ import { DungeonPortal } from './components/ui/DungeonPortal';
 import { HunterTrainingBackground } from './components/training/HunterTrainingBackground';
 import { SettingsProvider } from './contexts/SettingsContext';
 import { GlobalThemeState } from './components/ui/GlobalThemeState';
+import { PWAInstallPrompt } from './components/ui/PWAInstallPrompt';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -47,6 +48,7 @@ function App() {
           <LevelUpCinematic />
           <BossWarning />
           <DungeonPortal />
+          <PWAInstallPrompt />
 
           <div className="min-h-screen flex flex-col relative overflow-hidden bg-[var(--color-system-black)] pb-safe md:pb-0 md:pt-16 selection:bg-cyan-900 selection:text-white">
             

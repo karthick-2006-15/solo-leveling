@@ -1,3 +1,13 @@
+import { precacheAndRoute } from 'workbox-precaching';
+import { clientsClaim } from 'workbox-core';
+
+// Automatically claim clients and skip waiting for seamless updates
+self.skipWaiting();
+clientsClaim();
+
+// Precache Vite build assets
+precacheAndRoute(self.__WB_MANIFEST);
+
 self.addEventListener('push', function(event) {
   if (event.data) {
     const data = event.data.json();

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchDailyQuests, fetchWeeklyBoss, fetchBadges, fetchShadows, resurrectShadow, type QuestInstance, type WeeklyBossInstance, type Badge } from '../api/missionApi';
+import { fetchDailyQuests, fetchWeeklyBoss, fetchBadges, fetchShadows, resurrectShadow, fetchCheckInStatus, type QuestInstance, type WeeklyBossInstance, type Badge } from '../api/missionApi';
 import { useAuthStore } from '../store/useAuthStore';
 
 export const useMissions = () => {
@@ -30,6 +30,12 @@ export const useMissions = () => {
     enabled: isAuthenticated
   });
 
+  const { data: hasCheckedInToday, isLoading: checkInLoading } = useQuery<boolean>({
+    queryKey: ['missions', 'checkInStatus'],
+    queryFn: fetchCheckInStatus,
+    enabled: isAuthenticated
+  });
+
   const resurrectMutation = useMutation({
     mutationFn: (shadowId: string) => resurrectShadow(shadowId),
     onSuccess: () => {
@@ -47,6 +53,8 @@ export const useMissions = () => {
     badgesLoading,
     shadows: shadows || [],
     shadowsLoading,
+    hasCheckedInToday: hasCheckedInToday || false,
+    checkInLoading,
     resurrectShadow: resurrectMutation.mutateAsync,
     isResurrecting: resurrectMutation.isPending
   };

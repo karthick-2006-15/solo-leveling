@@ -15,6 +15,17 @@ export interface INotificationSettings extends Document {
   email: {
     enabled: boolean;
   };
+  audio: {
+    soundEnabled: boolean;
+    masterVolume: number;
+    musicVolume: number;
+    effectsVolume: number;
+    voiceVolume: number;
+  };
+  accessibility: {
+    reducedMotion: boolean;
+    highContrast: boolean;
+  };
   pushSubscription?: any; // Web Push subscription object
 }
 
@@ -55,6 +66,17 @@ const NotificationSettingsSchema: Schema = new Schema({
   },
   email: {
     enabled: { type: Boolean, default: false }
+  },
+  audio: {
+    soundEnabled: { type: Boolean, default: true },
+    masterVolume: { type: Number, default: 1.0 },
+    musicVolume: { type: Number, default: 0.5 },
+    effectsVolume: { type: Number, default: 0.8 },
+    voiceVolume: { type: Number, default: 1.0 }
+  },
+  accessibility: {
+    reducedMotion: { type: Boolean, default: false },
+    highContrast: { type: Boolean, default: false }
   },
   pushSubscription: { type: Schema.Types.Mixed, default: null }
 });

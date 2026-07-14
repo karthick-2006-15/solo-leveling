@@ -9,17 +9,10 @@ import { MissionHistory } from './MissionHistory';
 
 export const MissionBoard: React.FC = () => {
   const queryClient = useQueryClient();
-  
-  // Track if check-in is needed today (Mock implementation for now)
-  const [needsCheckIn, setNeedsCheckIn] = useState(() => {
-    const last = localStorage.getItem('lastCheckIn');
-    return last !== new Date().toDateString();
-  });
-
   const [checkInData, setCheckInData] = useState({ sleepQuality: 80, energyLevel: 80, stressLevel: 20 });
   const [isCheckingIn, setIsCheckingIn] = useState(false);
 
-  const { quests, questsLoading: isLoading, shadows, resurrectShadow, isResurrecting } = useMissions();
+  const { quests, questsLoading: isLoading, shadows, resurrectShadow, isResurrecting, hasCheckedInToday, checkInLoading } = useMissions();
 
   const completeMutation = useMutation({
     mutationFn: async (quest: any) => {
@@ -42,8 +35,7 @@ export const MissionBoard: React.FC = () => {
         method: 'POST',
         body: JSON.stringify(checkInData)
       });
-      localStorage.setItem('lastCheckIn', new Date().toDateString());
-      setNeedsCheckIn(false);
+      queryClient.invalidateQueries({ queryKey: ['missions', 'checkInStatus'] });
     } catch (err) {
       console.error(err);
     } finally {
@@ -51,7 +43,15 @@ export const MissionBoard: React.FC = () => {
     }
   };
 
-  if (needsCheckIn) {
+  if (checkInLoading) {
+    return (
+      <div className="hud-glass corner-brackets p-6 mb-8 animate-pulse text-center">
+        <h2 className="font-mono text-cyan-500 uppercase tracking-widest">Checking System Status...</h2>
+      </div>
+    );
+  }
+
+  if (!hasCheckedInToday) {
     return (
       <div className="hud-glass corner-brackets p-6 mb-8 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,212,255,0.1)_0%,rgba(0,0,0,0)_70%)] pointer-events-none" />

@@ -23,14 +23,14 @@ function urlBase64ToUint8Array(base64String: string) {
   return outputArray;
 }
 
-const PUBLIC_VAPID_KEY = 'BJUI9LR1K5R3THI1TQnUGf1RFAGqCh8rgvErUt2xxnC7gmdHh9YD4BnF4wII4dZeyGwvpsjGYaYcky1uFt7ZPxo';
+const PUBLIC_VAPID_KEY = 'BC9KNmW9K211ij4ic-KORaG1A7fL2_QQ9PMMFoqhtzA2Wd_QlcLWx4X8Xro7KcqXrdNZ6pGbHyWv4kZpN_OFQyA';
 
 export const NotificationsSettings = () => {
   const [settings, setSettings] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [toasts, setToasts] = useState<any[]>([]);
   
-  const { masterVolume, setMasterVolume, musicVolume, setMusicVolume, effectsVolume, setEffectsVolume, soundEnabled, toggleSound } = useAudioStore();
+  const { masterVolume, setMasterVolume, musicVolume, setMusicVolume, effectsVolume, setEffectsVolume, soundEnabled, setSoundEnabled } = useAudioStore();
   const { reducedMotion, setReducedMotion, highContrast, setHighContrast } = useSettings();
 
   const loadSettings = async () => {
@@ -138,6 +138,45 @@ export const NotificationsSettings = () => {
     }
   };
 
+  const handleAudioChange = async (key: string, value: number | boolean) => {
+    // update local state instantly
+    if (key === 'masterVolume') setMasterVolume(value as number);
+    if (key === 'musicVolume') setMusicVolume(value as number);
+    if (key === 'effectsVolume') setEffectsVolume(value as number);
+    if (key === 'soundEnabled') setSoundEnabled(value as boolean);
+
+    if (!settings) return;
+    const newSettings = JSON.parse(JSON.stringify(settings));
+    if (!newSettings.audio) newSettings.audio = {};
+    newSettings.audio[key] = value;
+    setSettings(newSettings);
+    
+    // We could debounce this, but backend handles small patches fast enough for now
+    try {
+      await updateNotificationSettings(newSettings);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleAccessibilityChange = async (key: string, value: boolean) => {
+    if (key === 'reducedMotion') setReducedMotion(value);
+    if (key === 'highContrast') setHighContrast(value);
+
+    if (!settings) return;
+    const newSettings = JSON.parse(JSON.stringify(settings));
+    if (!newSettings.accessibility) newSettings.accessibility = {};
+    newSettings.accessibility[key] = value;
+    setSettings(newSettings);
+    
+    try {
+      await updateNotificationSettings(newSettings);
+      showToast('Display Settings Saved');
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   if (loading || !settings) {
     return <div className="animate-pulse text-neonBlue text-center mt-20">Loading Settings...</div>;
   }
@@ -163,7 +202,7 @@ export const NotificationsSettings = () => {
             <p className="text-sm text-textMuted">Toggle all sound effects and background music.</p>
           </div>
           <button 
-            onClick={toggleSound}
+            onClick={() => handleAudioChange('soundEnabled', !soundEnabled)}
             className={`px-4 py-2 rounded font-bold transition-all ${soundEnabled ? 'bg-neonBlue/20 text-neonBlue border border-neonBlue' : 'bg-white/10 text-textMuted'}`}
           >
             {soundEnabled ? 'ENABLED' : 'MUTED'}
@@ -176,21 +215,21 @@ export const NotificationsSettings = () => {
               <span>Master Volume</span>
               <span className="text-neonBlue">{Math.round(masterVolume * 100)}%</span>
             </div>
-            <input type="range" min="0" max="1" step="0.05" value={masterVolume} onChange={(e) => setMasterVolume(Number(e.target.value))} className="w-full accent-neonBlue" />
+            <input type="range" min="0" max="1" step="0.05" value={masterVolume} onMouseUp={(e) => handleAudioChange('masterVolume', Number((e.target as HTMLInputElement).value))} onChange={(e) => setMasterVolume(Number(e.target.value))} className="w-full accent-neonBlue" />
           </div>
           <div>
             <div className="flex justify-between text-sm mb-1">
               <span>Background Music</span>
               <span className="text-purple-400">{Math.round(musicVolume * 100)}%</span>
             </div>
-            <input type="range" min="0" max="1" step="0.05" value={musicVolume} onChange={(e) => setMusicVolume(Number(e.target.value))} className="w-full accent-purple-500" />
+            <input type="range" min="0" max="1" step="0.05" value={musicVolume} onMouseUp={(e) => handleAudioChange('musicVolume', Number((e.target as HTMLInputElement).value))} onChange={(e) => setMusicVolume(Number(e.target.value))} className="w-full accent-purple-500" />
           </div>
           <div>
             <div className="flex justify-between text-sm mb-1">
               <span>Sound Effects</span>
               <span className="text-green-400">{Math.round(effectsVolume * 100)}%</span>
             </div>
-            <input type="range" min="0" max="1" step="0.05" value={effectsVolume} onChange={(e) => setEffectsVolume(Number(e.target.value))} className="w-full accent-green-500" />
+            <input type="range" min="0" max="1" step="0.05" value={effectsVolume} onMouseUp={(e) => handleAudioChange('effectsVolume', Number((e.target as HTMLInputElement).value))} onChange={(e) => setEffectsVolume(Number(e.target.value))} className="w-full accent-green-500" />
           </div>
         </div>
       </GlassCard>
@@ -201,7 +240,7 @@ export const NotificationsSettings = () => {
         <GlassCard>
           <div className="flex justify-between items-center mb-2">
             <h3 className="font-bold flex items-center gap-2"><Minimize2 size={18} className="text-blue-400"/> Reduce Motion</h3>
-            <input type="checkbox" checked={reducedMotion} onChange={(e) => setReducedMotion(e.target.checked)} className="w-5 h-5 accent-neonBlue" />
+            <input type="checkbox" checked={reducedMotion} onChange={(e) => handleAccessibilityChange('reducedMotion', e.target.checked)} className="w-5 h-5 accent-neonBlue" />
           </div>
           <p className="text-xs text-textMuted">Disables particle effects, heavy animations, and 3D transitions.</p>
         </GlassCard>
@@ -209,7 +248,7 @@ export const NotificationsSettings = () => {
         <GlassCard>
           <div className="flex justify-between items-center mb-2">
             <h3 className="font-bold flex items-center gap-2"><Sliders size={18} className="text-yellow-400"/> High Contrast</h3>
-            <input type="checkbox" checked={highContrast} onChange={(e) => setHighContrast(e.target.checked)} className="w-5 h-5 accent-neonBlue" />
+            <input type="checkbox" checked={highContrast} onChange={(e) => handleAccessibilityChange('highContrast', e.target.checked)} className="w-5 h-5 accent-neonBlue" />
           </div>
           <p className="text-xs text-textMuted">Increases text readability and borders.</p>
         </GlassCard>

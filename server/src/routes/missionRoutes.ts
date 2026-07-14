@@ -9,6 +9,7 @@ router.use(requireAuth);
 router.get('/quests/today', missionController.getDailyQuests);
 router.get('/boss/current', missionController.getCurrentBoss);
 router.get('/badges', missionController.getBadges);
+router.get('/check-in/status', missionController.getCheckInStatus);
 router.post('/check-in', missionController.checkIn);
 router.get('/shadows', missionController.getShadowArmy);
 router.post('/shadows/resurrect', missionController.resurrectShadow);
