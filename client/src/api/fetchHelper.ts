@@ -100,7 +100,7 @@ const executeFetchWithRetry = async (endpoint: string, options: RequestInit = {}
         useAuthStore.getState().logout();
       }
       
-      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      throw new Error(errorData.message || errorData.error || `HTTP error! status: ${response.status}`);
 
     } catch (error: any) {
       clearTimeout(timeoutId);

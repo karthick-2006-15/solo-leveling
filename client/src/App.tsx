@@ -11,6 +11,7 @@ import { SystemBootSequence } from './components/ui/SystemBootSequence';
 import { LevelUpCinematic } from './components/ui/LevelUpCinematic';
 import { BossWarning } from './components/ui/BossWarning';
 import { DungeonPortal } from './components/ui/DungeonPortal';
+import { MorningOathModal } from './components/ui/MorningOathModal';
 import { HunterTrainingBackground } from './components/training/HunterTrainingBackground';
 import { SettingsProvider } from './contexts/SettingsContext';
 import { GlobalThemeState } from './components/ui/GlobalThemeState';
@@ -48,6 +49,7 @@ function App() {
           <LevelUpCinematic />
           <BossWarning />
           <DungeonPortal />
+          <MorningOathModal />
           <PWAInstallPrompt />
 
           <div className="min-h-screen flex flex-col relative overflow-hidden bg-[var(--color-system-black)] pb-safe md:pb-0 md:pt-16 selection:bg-cyan-900 selection:text-white">

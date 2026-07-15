@@ -38,22 +38,39 @@ class StatusService {
     const lifetimeStudy = await StudySession.countDocuments({ userId });
     const intScore = 10 + Math.floor(lifetimeStudy / 2);
 
-    // END: based on water and sleep
+    // END / VIT: based on water and sleep
     const lifetimeWater = await WaterLog.countDocuments({ userId });
     const endScore = 10 + Math.floor(lifetimeWater / 5);
+
+    // PER: based on reading habits
+    const readingHabits = await HabitCompletion.countDocuments({ 
+      userId, 
+      habitId: { $in: await HabitCompletion.find({ userId, 'notes': { $regex: /read/i } }).distinct('habitId') } 
+    });
+    const perScore = 10 + Math.floor(readingHabits / 2);
+
+    // WIS: based on meditation
+    const meditationHabits = await HabitCompletion.countDocuments({ 
+      userId, 
+      habitId: { $in: await HabitCompletion.find({ userId, 'notes': { $regex: /meditat/i } }).distinct('habitId') } 
+    });
+    const wisScore = 10 + Math.floor(meditationHabits / 2);
+
+    // FOC: based on deep work
+    const focusScore = 10 + Math.floor(lifetimeStudy / 3);
 
     // Update Monarch state with computed attributes
     monarch.attributes.STR = strScore;
     monarch.attributes.INT = intScore;
     monarch.attributes.END = endScore;
     
-    // Fallbacks for other stats (can be expanded later)
+    // Fallbacks for other stats
     monarch.attributes.AGI = 10 + Math.floor(lifetimeWorkouts / 3);
-    monarch.attributes.WIS = 10 + Math.floor(lifetimeStudy / 3);
-    monarch.attributes.PER = 10 + Math.floor(profile.totalClaims / 2);
+    monarch.attributes.WIS = wisScore;
+    monarch.attributes.PER = perScore;
     monarch.attributes.CHA = 10 + Math.floor(profile.level / 2);
     monarch.attributes.MNT = 10 + Math.floor(monarch.attributes.willpower / 10);
-    monarch.attributes.FOC = 10 + Math.floor(monarch.attributes.focus / 10);
+    monarch.attributes.FOC = focusScore;
     monarch.attributes.DIS = 10 + Math.floor(monarch.attributes.discipline / 10);
     monarch.attributes.REC = 10 + Math.floor(monarch.balance.recovery / 10);
     monarch.attributes.WIL = 10 + Math.floor(monarch.attributes.willpower / 10);
@@ -88,8 +105,11 @@ class StatusService {
 
     // 4. Power Score
     const combatPower = (strScore + monarch.attributes.AGI + endScore) * profile.level;
-    const knowledgePower = (intScore + monarch.attributes.WIS + monarch.attributes.PER) * profile.level;
+    const knowledgePower = (intScore + wisScore + perScore) * profile.level;
     const overallPower = combatPower + knowledgePower;
+    const aura = Math.floor(overallPower / 50 + profile.level);
+    const dopamine = Math.max(0, 100 - (monarch.attributes.corruption * 0.8));
+    const statPoints = Math.max(0, profile.level * 5 - (strScore + intScore + endScore + monarch.attributes.AGI + wisScore + perScore - 60));
 
     // 5. Shadows & Bosses
     const shadows = await QuestInstance.find({ userId, status: 'failed', isShadow: true });
@@ -104,6 +124,20 @@ class StatusService {
     const debuffs = [];
     if (fatigue > 70) debuffs.push({ name: 'High Fatigue', value: '-20% STR' });
     if (monarch.attributes.corruption > 50) debuffs.push({ name: 'High Corruption', value: 'Shadow Resistance -30%' });
+
+    // 7. Mock Growth Timeline (Since history model doesn't exist yet)
+    const growthTimeline = Array.from({ length: 7 }).map((_, i) => ({
+      date: new Date(Date.now() - (6 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      level: Math.max(1, profile.level - Math.floor((6 - i) / 3)),
+      overallPower: Math.max(10, overallPower - (6 - i) * 15),
+    }));
+
+    const attributeHistory = {
+      STR: [strScore - 5, strScore - 3, strScore],
+      INT: [intScore - 4, intScore - 2, intScore],
+      AGI: [monarch.attributes.AGI - 3, monarch.attributes.AGI - 1, monarch.attributes.AGI],
+      END: [endScore - 2, endScore - 1, endScore],
+    };
 
     return {
       status: {
@@ -121,7 +155,7 @@ class StatusService {
         recovery: Math.floor(recovery),
         fatigue: Math.floor(fatigue),
         stress: Math.max(0, Math.floor(fatigue * 0.8)),
-        focus: Math.floor(monarch.attributes.focus),
+        focus: Math.floor(focusScore),
         willpower: Math.floor(monarch.attributes.willpower),
       },
       primaryAttributes: {
@@ -129,11 +163,11 @@ class StatusService {
         AGI: monarch.attributes.AGI,
         END: endScore,
         INT: intScore,
-        WIS: monarch.attributes.WIS,
-        PER: monarch.attributes.PER,
+        WIS: wisScore,
+        PER: perScore,
         CHA: monarch.attributes.CHA,
         MNT: monarch.attributes.MNT,
-        FOC: monarch.attributes.FOC,
+        FOC: focusScore,
         DIS: monarch.attributes.DIS,
         REC: monarch.attributes.REC,
         WIL: monarch.attributes.WIL,
@@ -153,6 +187,11 @@ class StatusService {
         knowledgePower,
         shadowResistance: 100 - monarch.attributes.corruption,
         corruption: monarch.attributes.corruption,
+        aura,
+        dopamine,
+        availableStatPoints: statPoints,
+        vitality: endScore,
+        resilience: Math.floor((endScore + monarch.attributes.WIL) / 2)
       },
       innerMonarch: monarch,
       shadows: {
@@ -168,7 +207,9 @@ class StatusService {
         lifetimeXP: profile.totalXP,
         totalClaims: profile.totalClaims,
         hunterScore: profile.hunterScore,
-      }
+      },
+      growthTimeline,
+      attributeHistory
     };
   }
 }

@@ -10,12 +10,15 @@ export interface IUser extends Document {
   height?: number;
   weight?: number;
   bodyFatPercent?: number;
+  targetWeight?: number;
+  targetBodyFat?: number;
+  medicalNotes?: string;
   fitnessGoal?: 'lose_weight' | 'gain_muscle' | 'maintain' | 'general_health';
   dailyCalorieGoal?: number;
   dailyProteinGoal?: number;
   dailyWaterGoalLiters?: number;
   activityLevel?: 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active';
-  experienceLevel?: 'beginner' | 'intermediate' | 'advanced';
+  experienceLevel?: 'beginner' | 'intermediate' | 'advanced' | 'expert';
   healthMetrics?: {
     sleepQuality: number;
     energyLevel: number;
@@ -43,6 +46,9 @@ const UserSchema: Schema = new Schema({
   height: { type: Number }, // in cm
   weight: { type: Number }, // in kg
   bodyFatPercent: { type: Number },
+  targetWeight: { type: Number }, // in kg
+  targetBodyFat: { type: Number },
+  medicalNotes: { type: String },
   
   // Goals
   fitnessGoal: { 
@@ -60,7 +66,7 @@ const UserSchema: Schema = new Schema({
   },
   experienceLevel: { 
     type: String, 
-    enum: ['beginner', 'intermediate', 'advanced'] 
+    enum: ['beginner', 'intermediate', 'advanced', 'expert'] 
   },
   
   healthMetrics: {

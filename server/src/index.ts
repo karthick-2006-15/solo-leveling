@@ -8,6 +8,7 @@ import statusRoutes from './routes/statusRoutes';
 import path from 'path';
 import dotenvSafe from 'dotenv-safe';
 import mongoose from 'mongoose';
+import guardianRoutes from './routes/guardianRoutes';
 
 // Ensure unhandled rejections and exceptions are logged clearly before anything else starts
 process.on('uncaughtException', (err) => {
@@ -100,6 +101,7 @@ async function bootstrap() {
     const monarchRoutes = (await import('./routes/monarchRoutes')).default;
     const rewardRoutes = (await import('./routes/rewardRoutes')).default;
     const storyRoutes = (await import('./routes/storyRoutes')).default;
+    const screenTimeRoutes = (await import('./routes/screenTimeRoutes')).default;
     
     // Error Handler
     const { globalErrorHandler } = await import('./middleware/errorHandler');
@@ -165,6 +167,8 @@ async function bootstrap() {
     app.use('/api/monarch', monarchRoutes);
     app.use('/api/rewards', rewardRoutes);
     app.use('/api/story', storyRoutes);
+    app.use('/api/screentime', screenTimeRoutes);
+    app.use('/api/guardian', guardianRoutes);
 
     // Serve Frontend in Production
     if (process.env.NODE_ENV === 'production') {

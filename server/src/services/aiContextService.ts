@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import User from '../models/User';
 import ProgressionProfile from '../models/ProgressionProfile';
 import FoodLog from '../models/FoodLog';
@@ -331,7 +332,7 @@ export const vectorSearchContext = async (userId: string, query: string): Promis
           queryVector: queryEmbedding,
           numCandidates: 100,
           limit: 5,
-          filter: { userId: { $eq: userId } }
+          filter: { userId: { $eq: new mongoose.Types.ObjectId(userId) } }
         }
       },
       {

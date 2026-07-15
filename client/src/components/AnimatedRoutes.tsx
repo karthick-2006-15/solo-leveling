@@ -16,7 +16,7 @@ const AriaCommandCenter = React.lazy(() => import('../pages/AriaCommandCenter').
 const Vitals = React.lazy(() => import('../pages/Vitals').then(module => ({ default: module.Vitals })));
 const InnerMonarch = React.lazy(() => import('../pages/InnerMonarch').then(module => ({ default: module.InnerMonarch })));
 const Economy = React.lazy(() => import('../pages/Economy').then(module => ({ default: module.Economy })));
-const Shop = React.lazy(() => import('../pages/Shop').then(module => ({ default: module.Shop })));
+const SystemHub = React.lazy(() => import('../pages/SystemHub').then(module => ({ default: module.SystemHub })));
 const HunterMuseum = React.lazy(() => import('../pages/HunterMuseum').then(module => ({ default: module.HunterMuseum })));
 const Inventory = React.lazy(() => import('../pages/Inventory').then(module => ({ default: module.Inventory })));
 const Dungeons = React.lazy(() => import('../pages/Dungeons').then(module => ({ default: module.Dungeons })));
@@ -27,6 +27,9 @@ const CareerDashboard = React.lazy(() => import('../pages/CareerDashboard'));
 const AcademicDashboard = React.lazy(() => import('../pages/AcademicDashboard'));
 const FinanceDashboard = React.lazy(() => import('../pages/FinanceDashboard'));
 const AriaPlanner = React.lazy(() => import('../pages/AriaPlanner'));
+const ScreenTimeDashboard = React.lazy(() => import('../pages/ScreenTimeDashboard').then(module => ({ default: module.ScreenTimeDashboard })));
+const GuardianDashboard = React.lazy(() => import('../pages/GuardianDashboard').then(module => ({ default: module.GuardianDashboard })));
+const GuardianMode = React.lazy(() => import('../pages/GuardianMode').then(module => ({ default: module.GuardianMode })));
 import { ProtectedRoute } from './ProtectedRoute';
 
 const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -67,7 +70,7 @@ export const AnimatedRoutes: React.FC = () => {
         <Route path="/vitals" element={<ProtectedRoute><PageWrapper><Vitals /></PageWrapper></ProtectedRoute>} />
         <Route path="/monarch" element={<ProtectedRoute><PageWrapper><InnerMonarch /></PageWrapper></ProtectedRoute>} />
         <Route path="/economy" element={<ProtectedRoute><PageWrapper><Economy /></PageWrapper></ProtectedRoute>} />
-        <Route path="/shop" element={<ProtectedRoute><PageWrapper><Shop /></PageWrapper></ProtectedRoute>} />
+        <Route path="/hub" element={<ProtectedRoute><PageWrapper><SystemHub /></PageWrapper></ProtectedRoute>} />
         <Route path="/museum" element={<ProtectedRoute><PageWrapper><HunterMuseum /></PageWrapper></ProtectedRoute>} />
         <Route path="/dungeons" element={<ProtectedRoute><PageWrapper><Dungeons /></PageWrapper></ProtectedRoute>} />
         <Route path="/shadows" element={<ProtectedRoute><PageWrapper><ShadowArmy /></PageWrapper></ProtectedRoute>} />
@@ -79,6 +82,9 @@ export const AnimatedRoutes: React.FC = () => {
         <Route path="/academics" element={<ProtectedRoute><PageWrapper><AcademicDashboard /></PageWrapper></ProtectedRoute>} />
         <Route path="/finance" element={<ProtectedRoute><PageWrapper><FinanceDashboard /></PageWrapper></ProtectedRoute>} />
         <Route path="/aria-planner" element={<ProtectedRoute><PageWrapper><AriaPlanner /></PageWrapper></ProtectedRoute>} />
+        <Route path="/screentime" element={<ProtectedRoute><PageWrapper><ScreenTimeDashboard /></PageWrapper></ProtectedRoute>} />
+        <Route path="/guardian" element={<ProtectedRoute><PageWrapper><GuardianDashboard /></PageWrapper></ProtectedRoute>} />
+        <Route path="/guardian-mode" element={<ProtectedRoute><GuardianMode /></ProtectedRoute>} />
         <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
       </Routes>
     </AnimatePresence>

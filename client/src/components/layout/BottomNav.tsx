@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useSystemSound } from '../../hooks/useSystemSound';
 import { haptics } from '../../utils/haptics';
-import { LayoutDashboard, Target, Activity, User as UserIcon, Heart, Crown, Box, Castle as DungeonIcon, BookOpen } from 'lucide-react';
+import { LayoutDashboard, Target, Activity, User as UserIcon, Heart, Crown, Box, Castle as DungeonIcon, BookOpen, Focus, ShieldCheck, Grid } from 'lucide-react';
 
 export const BottomNav: React.FC = () => {
   const { user } = useAuthStore();
@@ -20,6 +20,9 @@ export const BottomNav: React.FC = () => {
     { name: 'Monarch', path: '/monarch', icon: Crown },
     { name: 'Quests', path: '/achievements', icon: Target },
     { name: 'Gates', path: '/dungeons', icon: DungeonIcon },
+    { name: 'Focus', path: '/screentime', icon: Focus },
+    { name: 'Guardian', path: '/guardian', icon: ShieldCheck },
+    { name: 'Hub', path: '/hub', icon: Grid },
     { name: 'Lore', path: '/story', icon: BookOpen },
     { name: 'Inventory', path: '/inventory', icon: Box },
     { name: 'Status', path: '/status', icon: UserIcon },

@@ -8,6 +8,8 @@ import {
 } from 'lucide-react';
 import clsx from 'clsx';
 import { useNavigate } from 'react-router-dom';
+import { RadarChartWidget } from '../components/status/RadarChartWidget';
+import { GrowthTimelineWidget } from '../components/status/GrowthTimelineWidget';
 
 const StatusWindow: React.FC = () => {
   const { data: statusData, isLoading, error } = useStatusWindow();
@@ -45,7 +47,7 @@ const StatusWindow: React.FC = () => {
     );
   }
 
-  const { status, vitals, primaryAttributes, secondaryStats, powerScore, shadows, buffs, debuffs, records } = statusData;
+  const { status, vitals, primaryAttributes, secondaryStats, powerScore, shadows, buffs, debuffs, records, growthTimeline } = statusData;
 
   const getRankColor = (rank: string) => {
     if (rank.includes('S')) return 'text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]';
@@ -168,6 +170,9 @@ const StatusWindow: React.FC = () => {
                   </div>
                 </div>
 
+                <RadarChartWidget primaryAttributes={primaryAttributes} />
+                <GrowthTimelineWidget growthTimeline={growthTimeline || []} />
+
                 {/* Buffs & Debuffs */}
                 <div className="bg-[#05070a]/80 border border-cyan-900/50 rounded-lg p-4 md:p-5 space-y-4">
                   <div>
@@ -211,7 +216,7 @@ const StatusWindow: React.FC = () => {
                 <div className="bg-[#05070a]/80 border border-cyan-900/50 rounded-lg p-4 md:p-5">
                   <h3 className="text-cyan-500 uppercase tracking-widest text-sm mb-6 border-b border-cyan-900/50 pb-2 flex justify-between">
                     <span>Primary Attributes</span>
-                    <span className="text-cyan-700">Available Points: 0</span>
+                    <span className="text-cyan-700">Available Points: {powerScore.availableStatPoints ?? 0}</span>
                   </h3>
                   
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 lg:gap-6">
@@ -279,6 +284,18 @@ const StatusWindow: React.FC = () => {
                       <div className="flex justify-between items-center">
                         <span className="text-amber-300/70 text-sm">Lifetime XP</span>
                         <span className="text-amber-400 font-bold">{records.lifetimeXP.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-amber-300/70 text-sm">Aura Rating</span>
+                        <span className="text-amber-400 font-bold">{powerScore.aura ?? 0}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-amber-300/70 text-sm">Vitality</span>
+                        <span className="text-amber-400 font-bold">{powerScore.vitality ?? 0}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-amber-300/70 text-sm">Resilience</span>
+                        <span className="text-amber-400 font-bold">{powerScore.resilience ?? 0}</span>
                       </div>
                     </div>
                   </div>

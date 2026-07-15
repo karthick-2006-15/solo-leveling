@@ -53,9 +53,20 @@ export const Settings: React.FC = () => {
     setIsSubmitting(true);
     setSaveMessage('');
     try {
+      const payload: Record<string, any> = { ...formData };
+      const numberFields = ['age', 'height', 'weight', 'bodyFatPercent', 'targetWeight', 'targetBodyFat', 'dailyCalorieGoal', 'dailyProteinGoal', 'dailyWaterGoalLiters'];
+      
+      Object.keys(payload).forEach(key => {
+        if (payload[key] === '') {
+          payload[key] = null;
+        } else if (numberFields.includes(key) && payload[key] !== null) {
+          payload[key] = Number(payload[key]);
+        }
+      });
+
       const res = await fetchWithAuth('/api/users/profile', {
         method: 'PUT',
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
       
@@ -205,10 +216,10 @@ export const Settings: React.FC = () => {
                       <label className="block text-[9px] font-mono text-cyan-400 uppercase tracking-widest mb-1">Activity Level</label>
                       <select name="activityLevel" value={formData.activityLevel} onChange={handleChange} className="w-full bg-black/50 border border-cyan-900/50 rounded px-4 py-3 text-white font-mono text-base md:text-sm focus:border-cyan-400 focus:outline-none transition-colors appearance-none">
                         <option value="sedentary">Sedentary (Office job, little exercise)</option>
-                        <option value="lightly_active">Lightly Active (1-3 days/week)</option>
-                        <option value="moderately_active">Moderately Active (3-5 days/week)</option>
-                        <option value="very_active">Very Active (6-7 days/week)</option>
-                        <option value="extra_active">Extra Active (Physical job + training)</option>
+                        <option value="light">Lightly Active (1-3 days/week)</option>
+                        <option value="moderate">Moderately Active (3-5 days/week)</option>
+                        <option value="active">Active (6-7 days/week)</option>
+                        <option value="very_active">Very Active (Physical job + training)</option>
                       </select>
                     </div>
 
