@@ -58,7 +58,7 @@ export const ShopTab: React.FC = () => {
                 
                 <div className="p-4 md:p-5">
                   <div className="flex justify-between items-start mb-3">
-                    <div className={`w-12 h-12 rounded-lg ${config.bg} bg-opacity-10 flex items-center justify-center text-2xl ${config.text}`}>
+                    <div className={`w-12 h-12 rounded-lg ${config.bg} bg-opacity-10 flex items-center justify-center text-2xl ${config.color}`}>
                       {getIcon(item.type)}
                     </div>
                     {item.reqLevel && (progression?.level || 0) < item.reqLevel && (
@@ -69,7 +69,7 @@ export const ShopTab: React.FC = () => {
                     )}
                   </div>
 
-                  <h3 className={`font-display text-lg tracking-wider mb-1 ${config.text} drop-shadow-sm`}>
+                  <h3 className={`font-display text-lg tracking-wider mb-1 ${config.color} drop-shadow-sm`}>
                     {item.name}
                   </h3>
                   
@@ -78,7 +78,7 @@ export const ShopTab: React.FC = () => {
                   </p>
 
                   <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
-                    <div className={`font-mono text-sm tracking-widest uppercase ${config.text}`}>
+                    <div className={`font-mono text-sm tracking-widest uppercase ${config.color}`}>
                       {item.rarity}
                     </div>
                     

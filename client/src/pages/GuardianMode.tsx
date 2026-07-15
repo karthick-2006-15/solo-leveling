@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { guardianApi } from '../api/guardianApi';
 import { ShieldAlert, Activity, CheckCircle2, Skull } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';

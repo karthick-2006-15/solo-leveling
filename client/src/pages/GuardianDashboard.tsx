@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PageHeader } from '../components/ui/PageHeader';
 import { guardianApi } from '../api/guardianApi';
-import { Shield, ShieldAlert, Heart, Flame, Zap, ShieldCheck, Activity, Target } from 'lucide-react';
+import { ShieldAlert, Heart, Flame, Zap, ShieldCheck, Activity, Target } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 export const GuardianDashboard = () => {
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [nightReport, setNightReport] = useState<string | null>(null);
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);

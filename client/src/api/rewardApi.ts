@@ -16,6 +16,7 @@ export interface ShopItem {
   currencyType: string;
   rotationType: string;
   activeUntil?: string;
+  reqLevel?: number;
   metadata?: Record<string, any>;
 }
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { PageHeader } from '../components/ui/PageHeader';
 import { useInventory } from '../hooks/useInventory';
 import { InventoryStats } from '../components/inventory/InventoryStats';
